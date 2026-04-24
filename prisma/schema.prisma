@@ -1,0 +1,758 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Agency {
+  id                     String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                   String                  @db.VarChar(255)
+  slug                   String                  @unique @db.VarChar(100)
+  logoUrl                String?                 @map("logo_url") @db.VarChar(1000)
+  faviconUrl             String?                 @map("favicon_url") @db.VarChar(1000)
+  primaryColor           String?                 @map("primary_color") @db.VarChar(7)
+  secondaryColor         String?                 @map("secondary_color") @db.VarChar(7)
+  customDomain           String?                 @unique @map("custom_domain") @db.VarChar(255)
+  emailFromName          String?                 @map("email_from_name") @db.VarChar(100)
+  emailFromAddress       String?                 @map("email_from_address") @db.VarChar(255)
+  plan                   AgencyPlan              @default(FREELANCER)
+  stripeCustomerId       String?                 @unique @map("stripe_customer_id") @db.VarChar(255)
+  stripeSubscriptionId   String?                 @unique @map("stripe_subscription_id") @db.VarChar(255)
+  stripePriceId          String?                 @map("stripe_price_id") @db.VarChar(255)
+  subscriptionStatus     String                  @default("trialing") @map("subscription_status") @db.VarChar(50)
+  subscriptionPeriodEnd  DateTime?               @map("subscription_period_end") @db.Timestamptz(6)
+  trialEndsAt            DateTime?               @map("trial_ends_at") @db.Timestamptz(6)
+  isActive               Boolean                 @default(true) @map("is_active")
+  ownerId                String?                 @map("owner_id") @db.Uuid
+  createdAt              DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime                @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  owner                  User?                   @relation("AgencyOwner", fields: [ownerId], references: [id], onUpdate: NoAction)
+  campaigns              Campaign[]
+  clientUserAssignments  ClientUserAssignment[]
+  clients                Client[]
+  dashboardWidgets       DashboardWidget[]
+  dashboards             Dashboard[]
+  integrationConnections IntegrationConnection[]
+  metricValues           MetricValue[]
+  refreshTokens          RefreshToken[]
+  reports                Report[]
+  reportSchedules        ReportSchedule[]
+  reportShareLinks       ReportShareLink[]
+  reportDeliveries       ReportDelivery[]
+  staffAssignments       StaffClientAssignment[]
+  users                  User[]                  @relation("AgencyUsers")
+  goals                  Goal[]
+  campaignNotes          CampaignNote[]
+  alerts                 Alert[]
+  alertEvents            AlertEvent[]
+  customMetricDefs       CustomMetricDefinition[]
+  aiConversations        AiConversation[]
+  aiMessages             AiMessage[]
+  billingEvents          BillingEvent[]
+
+  @@map("agencies")
+}
+
+model User {
+  id                                       String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId                                 String                  @map("tenant_id") @db.Uuid
+  email                                    String                  @unique @db.VarChar(255)
+  passwordHash                             String?                 @map("password_hash") @db.VarChar(255)
+  firstName                                String                  @map("first_name") @db.VarChar(100)
+  lastName                                 String                  @map("last_name") @db.VarChar(100)
+  avatarUrl                                String?                 @map("avatar_url") @db.VarChar(500)
+  role                                     UserRole
+  isActive                                 Boolean                 @default(true) @map("is_active")
+  emailVerifiedAt                          DateTime?               @map("email_verified_at") @db.Timestamptz(6)
+  lastLoginAt                              DateTime?               @map("last_login_at") @db.Timestamptz(6)
+  invitedById                              String?                 @map("invited_by_id") @db.Uuid
+  createdAt                                DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                                DateTime                @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  invitationTokenHash                      String?                 @map("invitation_token_hash") @db.VarChar(64)
+  invitationExpiresAt                      DateTime?               @map("invitation_expires_at") @db.Timestamptz(6)
+  pendingClientId                          String?                 @map("pending_client_id") @db.Uuid
+  ownedAgency                              Agency[]                @relation("AgencyOwner")
+  campaignsCreated                         Campaign[]              @relation("CampaignCreatedBy")
+  clientUserAssignedBy                     ClientUserAssignment[]  @relation("ClientUserAssignedBy")
+  clientUserAssignments                    ClientUserAssignment[]  @relation("ClientUserAssignments")
+  clientsCreated                           Client[]                @relation("ClientCreatedBy")
+  refreshTokens                            RefreshToken[]
+  assignedByMe                             StaffClientAssignment[] @relation("AssignedBy")
+  staffAssignments                         StaffClientAssignment[] @relation("StaffAssignments")
+  invitedBy                                User?                   @relation("UserInvitations", fields: [invitedById], references: [id], onUpdate: NoAction)
+  invitedUsers                             User[]                  @relation("UserInvitations")
+  clients_users_pending_client_idToclients Client?                 @relation("users_pending_client_idToclients", fields: [pendingClientId], references: [id], onUpdate: NoAction)
+  tenant                                   Agency                  @relation("AgencyUsers", fields: [tenantId], references: [id], onUpdate: NoAction)
+  campaignNotes                            CampaignNote[]          @relation("NoteAuthor")
+  goalsCreated                             Goal[]                  @relation("GoalCreatedBy")
+  alertsCreated                            Alert[]                 @relation("AlertCreatedBy")
+  customMetricDefsCreated                  CustomMetricDefinition[] @relation("CustomMetricCreatedBy")
+  aiConversations                          AiConversation[]
+
+  @@index([tenantId, role])
+  @@index([tenantId, isActive])
+  @@map("users")
+}
+
+model Client {
+  id                                     String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId                               String                  @map("tenant_id") @db.Uuid
+  name                                   String                  @db.VarChar(255)
+  website                                String?                 @db.VarChar(500)
+  logoUrl                                String?                 @map("logo_url") @db.VarChar(500)
+  color                                  String?                 @db.VarChar(7)
+  status                                 ClientStatus            @default(ACTIVE)
+  createdById                            String                  @map("created_by_id") @db.Uuid
+  createdAt                              DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                              DateTime                @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt                              DateTime?               @map("deleted_at") @db.Timestamptz(6)
+  campaigns                              Campaign[]
+  clientUserAssignments                  ClientUserAssignment[]
+  createdBy                              User                    @relation("ClientCreatedBy", fields: [createdById], references: [id], onUpdate: NoAction)
+  tenant                                 Agency                  @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
+  staffAssignments                       StaffClientAssignment[]
+  users_users_pending_client_idToclients User[]                  @relation("users_pending_client_idToclients")
+
+  @@index([tenantId, status, deletedAt])
+  @@map("clients")
+}
+
+model Campaign {
+  id                     String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId               String                  @map("tenant_id") @db.Uuid
+  clientId               String                  @map("client_id") @db.Uuid
+  name                   String                  @db.VarChar(255)
+  description            String?
+  status                 CampaignStatus          @default(ACTIVE)
+  createdById            String                  @map("created_by_id") @db.Uuid
+  createdAt              DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime                @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt              DateTime?               @map("deleted_at") @db.Timestamptz(6)
+  client                 Client                  @relation(fields: [clientId], references: [id], onUpdate: NoAction)
+  createdBy              User                    @relation("CampaignCreatedBy", fields: [createdById], references: [id], onUpdate: NoAction)
+  tenant                 Agency                  @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
+  dashboardWidgets       DashboardWidget[]
+  dashboards             Dashboard[]
+  integrationConnections IntegrationConnection[]
+  metricValues           MetricValue[]
+  reports                Report[]
+  goals                  Goal[]
+  notes                  CampaignNote[]
+  alerts                 Alert[]
+  alertEvents            AlertEvent[]
+  aiConversations        AiConversation[]
+
+  @@index([tenantId, clientId, deletedAt])
+  @@index([tenantId, status, deletedAt])
+  @@map("campaigns")
+}
+
+model StaffClientAssignment {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId     String   @map("tenant_id") @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  clientId     String   @map("client_id") @db.Uuid
+  assignedById String   @map("assigned_by_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  assignedBy   User     @relation("AssignedBy", fields: [assignedById], references: [id], onUpdate: NoAction)
+  client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tenant       Agency   @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
+  user         User     @relation("StaffAssignments", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([userId, clientId])
+  @@index([tenantId, clientId])
+  @@map("staff_client_assignments")
+}
+
+model ClientUserAssignment {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId     String   @map("tenant_id") @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  clientId     String   @map("client_id") @db.Uuid
+  assignedById String   @map("assigned_by_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  assignedBy   User     @relation("ClientUserAssignedBy", fields: [assignedById], references: [id], onUpdate: NoAction)
+  client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tenant       Agency   @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
+  user         User     @relation("ClientUserAssignments", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([userId, clientId])
+  @@index([tenantId, clientId])
+  @@index([userId])
+  @@map("client_user_assignments")
+}
+
+model RefreshToken {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId  String    @map("tenant_id") @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz(6)
+  userAgent String?   @map("user_agent") @db.VarChar(500)
+  ipAddress String?   @map("ip_address") @db.VarChar(45)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  tenant    Agency    @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId, expiresAt])
+  @@map("refresh_tokens")
+}
+
+model IntegrationConnection {
+  id                    String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId              String              @map("tenant_id") @db.Uuid
+  campaignId            String              @map("campaign_id") @db.Uuid
+  platform              IntegrationPlatform
+  status                ConnectionStatus    @default(DISCONNECTED)
+  accessTokenEnc        String?             @map("access_token_enc")
+  refreshTokenEnc       String?             @map("refresh_token_enc")
+  tokenExpiresAt        DateTime?           @map("token_expires_at")
+  refreshTokenExpiresAt DateTime?           @map("refresh_token_expires_at")
+  scopes                String?
+  externalAccountId     String?             @map("external_account_id") @db.VarChar(255)
+  platformAccountType   String?             @map("platform_account_type") @db.VarChar(100)
+  lastSyncAt            DateTime?           @map("last_sync_at")
+  lastErrorAt           DateTime?           @map("last_error_at")
+  lastErrorMessage      String?             @map("last_error_message")
+  createdAt             DateTime            @default(now()) @map("created_at")
+  updatedAt             DateTime            @default(now()) @updatedAt @map("updated_at")
+  campaign              Campaign            @relation(fields: [campaignId], references: [id])
+  tenant                Agency              @relation(fields: [tenantId], references: [id])
+
+  @@unique([campaignId, platform])
+  @@index([tenantId, status])
+  @@index([tenantId, platform, status])
+  @@map("integration_connections")
+}
+
+model Dashboard {
+  id                  String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId            String            @map("tenant_id") @db.Uuid
+  campaignId          String            @map("campaign_id") @db.Uuid
+  name                String            @db.VarChar(255)
+  isDefault           Boolean           @default(false) @map("is_default")
+  isTemplate          Boolean           @default(false) @map("is_template")
+  templateName        String?           @map("template_name") @db.VarChar(255)
+  templateDescription String?           @map("template_description")
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt           DateTime?         @map("deleted_at") @db.Timestamptz(6)
+  widgets    DashboardWidget[]
+  campaign   Campaign          @relation(fields: [campaignId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenant     Agency            @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenantId, campaignId], map: "idx_dashboards_campaign")
+  @@map("dashboards")
+}
+
+model DashboardWidget {
+  id          String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId    String               @map("tenant_id") @db.Uuid
+  dashboardId String               @map("dashboard_id") @db.Uuid
+  campaignId  String               @map("campaign_id") @db.Uuid
+  widgetType  WidgetType           @map("widget_type")
+  platform    IntegrationPlatform?
+  metricKeys  String[]             @default([]) @map("metric_keys")
+  config      Json                 @default("{}")
+  position    Json                 @default("{}")
+  createdAt   DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime?            @map("deleted_at") @db.Timestamptz(6)
+  campaign    Campaign             @relation(fields: [campaignId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  dashboard   Dashboard            @relation(fields: [dashboardId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenant      Agency               @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenantId, dashboardId], map: "idx_dashboard_widgets_dashboard")
+  @@map("dashboard_widgets")
+}
+
+model Report {
+  id                   String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId             String           @map("tenant_id") @db.Uuid
+  campaignId           String           @map("campaign_id") @db.Uuid
+  name                 String           @db.VarChar(255)
+  sections             Json             @default("[]")
+  version              Int              @default(1)
+  status               ReportStatus     @default(DRAFT)
+  pdfUrl               String?          @map("pdf_url") @db.VarChar(1000)
+  pdfGeneratedAt       DateTime?        @map("pdf_generated_at") @db.Timestamptz(6)
+  aiSummary            String?          @map("ai_summary")
+  aiSummaryGeneratedAt DateTime?        @map("ai_summary_generated_at") @db.Timestamptz(6)
+  aiSummaryModel       String?          @map("ai_summary_model") @db.VarChar(100)
+  aiSummaryVersion     Int?             @map("ai_summary_version")
+  isTemplate           Boolean          @default(false) @map("is_template")
+  templateName         String?          @map("template_name") @db.VarChar(255)
+  templateDescription  String?          @map("template_description")
+  createdById          String           @map("created_by_id") @db.Uuid
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime?        @map("deleted_at") @db.Timestamptz(6)
+  campaign    Campaign         @relation(fields: [campaignId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenant      Agency           @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  schedules   ReportSchedule[]
+  shareLinks  ReportShareLink[]
+  deliveries  ReportDelivery[]
+
+  @@index([tenantId, campaignId, deletedAt], map: "idx_reports_campaign")
+  @@map("reports")
+}
+
+model ReportSchedule {
+  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId       String            @map("tenant_id") @db.Uuid
+  reportId       String            @map("report_id") @db.Uuid
+  cronExpression String            @map("cron_expression") @db.VarChar(100)
+  nextRunAt      DateTime?         @map("next_run_at") @db.Timestamptz(6)
+  isActive       Boolean           @default(true) @map("is_active")
+  recipientEmails String[]         @default([]) @map("recipient_emails")
+  dateRangeDays  Int               @default(30) @map("date_range_days")
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  report         Report            @relation(fields: [reportId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tenant         Agency            @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  deliveries     ReportDelivery[]
+
+  @@index([tenantId, isActive], map: "idx_report_schedules_active")
+  @@index([reportId], map: "idx_report_schedules_report")
+  @@index([nextRunAt], map: "idx_report_schedules_next_run")
+  @@map("report_schedules")
+}
+
+model ReportShareLink {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId   String    @map("tenant_id") @db.Uuid
+  reportId   String    @map("report_id") @db.Uuid
+  token      String    @unique @db.VarChar(512)
+  expiresAt  DateTime? @map("expires_at") @db.Timestamptz(6)
+  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz(6)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  report     Report    @relation(fields: [reportId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tenant     Agency    @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenantId, reportId], map: "idx_report_share_links_report")
+  @@map("report_share_links")
+}
+
+model ReportDelivery {
+  id         String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId   String          @map("tenant_id") @db.Uuid
+  reportId   String          @map("report_id") @db.Uuid
+  scheduleId String?         @map("schedule_id") @db.Uuid
+  status     DeliveryStatus  @default(PENDING)
+  pdfUrl     String?         @map("pdf_url") @db.VarChar(1000)
+  errorMsg   String?         @map("error_msg")
+  sentAt     DateTime?       @map("sent_at") @db.Timestamptz(6)
+  createdAt  DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  report     Report          @relation(fields: [reportId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  schedule   ReportSchedule? @relation(fields: [scheduleId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  tenant     Agency          @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenantId, reportId], map: "idx_report_deliveries_report")
+  @@map("report_deliveries")
+}
+
+model MetricDefinition {
+  id        String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  platform  IntegrationPlatform
+  metricKey String              @map("metric_key") @db.VarChar(100)
+  label     String              @db.VarChar(200)
+  category  String              @db.VarChar(50)
+  dataType  String              @map("data_type") @db.VarChar(20)
+  unit      String?             @db.VarChar(20)
+
+  @@unique([platform, metricKey])
+  @@index([platform], map: "idx_metric_definitions_platform")
+  @@map("metric_definitions")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model MetricValue {
+  id           String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId     String              @map("tenant_id") @db.Uuid
+  campaignId   String              @map("campaign_id") @db.Uuid
+  platform     IntegrationPlatform
+  metricKey    String              @map("metric_key") @db.VarChar(100)
+  recordedAt   DateTime            @map("recorded_at") @db.Date
+  value        Decimal             @db.Decimal(20, 6)
+  dimensionKey String?             @map("dimension_key") @db.VarChar(100)
+  dimensionVal String?             @map("dimension_val") @db.VarChar(200)
+  createdAt    DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime            @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  campaign     Campaign            @relation(fields: [campaignId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  agency       Agency              @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenantId, campaignId, platform, recordedAt(sort: Desc)], map: "idx_metric_values_campaign_date")
+  @@index([tenantId, campaignId, platform, metricKey, recordedAt], map: "idx_metric_values_lookup")
+  @@map("metric_values")
+}
+
+enum UserRole {
+  PLATFORM_OWNER
+  AGENCY_OWNER
+  AGENCY_ADMIN
+  AGENCY_STAFF
+  CLIENT_USER
+
+  @@map("user_role")
+}
+
+enum AgencyPlan {
+  FREELANCER
+  AGENCY
+  AGENCY_PRO
+
+  @@map("agency_plan")
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+
+  @@map("client_status")
+}
+
+enum CampaignStatus {
+  ACTIVE
+  PAUSED
+  INACTIVE
+
+  @@map("campaign_status")
+}
+
+enum WidgetType {
+  KPI
+  LINE_CHART
+  BAR_CHART
+  TABLE
+  PIE_CHART
+
+  @@map("widget_type")
+}
+
+enum IntegrationPlatform {
+  GA4
+  GOOGLE_ADS
+  META_ADS
+  GOOGLE_SEARCH_CONSOLE
+  LINKEDIN_ADS
+  YOUTUBE_ANALYTICS
+  TIKTOK_ADS
+  AMAZON_ADS
+  MAILCHIMP
+  SHOPIFY
+  SEMRUSH
+  MICROSOFT_ADS
+
+  @@map("integration_platform")
+}
+
+enum ConnectionStatus {
+  CONNECTED
+  EXPIRED
+  ERROR
+  DISCONNECTED
+
+  @@map("connection_status")
+}
+
+enum ReportStatus {
+  DRAFT
+  PUBLISHED
+
+  @@map("report_status")
+}
+
+enum DeliveryStatus {
+  PENDING
+  PROCESSING
+  SENT
+  FAILED
+
+  @@map("delivery_status")
+}
+
+enum GoalPeriodType {
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+
+  @@map("goal_period_type")
+}
+
+enum GoalStatus {
+  ON_TRACK
+  AT_RISK
+  BEHIND
+  ACHIEVED
+
+  @@map("goal_status")
+}
+
+model Goal {
+  id           String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId     String              @map("tenant_id") @db.Uuid
+  campaignId   String              @map("campaign_id") @db.Uuid
+  name         String              @db.VarChar(255)
+  platform     IntegrationPlatform
+  metricKey    String              @map("metric_key") @db.VarChar(100)
+  targetValue  Decimal             @map("target_value") @db.Decimal(20, 6)
+  periodType   GoalPeriodType      @default(MONTHLY) @map("period_type")
+  periodStart  DateTime            @map("period_start") @db.Date
+  periodEnd    DateTime            @map("period_end") @db.Date
+  createdById  String              @map("created_by_id") @db.Uuid
+  createdAt    DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime            @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime?           @map("deleted_at") @db.Timestamptz(6)
+  campaign     Campaign            @relation(fields: [campaignId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenant       Agency              @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy    User                @relation("GoalCreatedBy", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenantId, campaignId, deletedAt], map: "idx_goals_campaign")
+  @@index([tenantId, periodStart, periodEnd], map: "idx_goals_period")
+  @@map("goals")
+}
+
+model CampaignNote {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId   String    @map("tenant_id") @db.Uuid
+  campaignId String    @map("campaign_id") @db.Uuid
+  authorId   String    @map("author_id") @db.Uuid
+  body       String
+  isPinned   Boolean   @default(false) @map("is_pinned")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz(6)
+  campaign   Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tenant     Agency    @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  author     User      @relation("NoteAuthor", fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenantId, campaignId, deletedAt], map: "idx_campaign_notes_campaign")
+  @@index([tenantId, campaignId, createdAt(sort: Desc)], map: "idx_campaign_notes_created_at")
+  @@map("campaign_notes")
+}
+
+enum AlertCondition {
+  ABOVE
+  BELOW
+  PERCENT_CHANGE_ABOVE
+  PERCENT_CHANGE_BELOW
+
+  @@map("alert_condition")
+}
+
+enum AlertPeriodType {
+  DAILY
+  WEEKLY
+
+  @@map("alert_period_type")
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+
+  @@map("alert_severity")
+}
+
+model Alert {
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId         String          @map("tenant_id") @db.Uuid
+  campaignId       String          @map("campaign_id") @db.Uuid
+  name             String          @db.VarChar(255)
+  platform         IntegrationPlatform
+  metricKey        String          @map("metric_key") @db.VarChar(100)
+  condition        AlertCondition
+  threshold        Decimal         @db.Decimal(20, 6)
+  periodType       AlertPeriodType @default(DAILY) @map("period_type")
+  severity         AlertSeverity   @default(WARNING)
+  recipientEmails  String[]        @default([]) @map("recipient_emails")
+  cooldownHours    Int             @default(24) @map("cooldown_hours")
+  isActive         Boolean         @default(true) @map("is_active")
+  lastTriggeredAt  DateTime?       @map("last_triggered_at") @db.Timestamptz(6)
+  createdById      String          @map("created_by_id") @db.Uuid
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt        DateTime?       @map("deleted_at") @db.Timestamptz(6)
+  campaign         Campaign        @relation(fields: [campaignId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenant           Agency          @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy        User            @relation("AlertCreatedBy", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  events           AlertEvent[]
+
+  @@index([tenantId, campaignId, deletedAt], map: "idx_alerts_campaign")
+  @@index([tenantId, campaignId, platform, isActive], map: "idx_alerts_active")
+  @@map("alerts")
+}
+
+model AlertEvent {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId        String   @map("tenant_id") @db.Uuid
+  alertId         String   @map("alert_id") @db.Uuid
+  campaignId      String   @map("campaign_id") @db.Uuid
+  triggeredValue  Decimal  @map("triggered_value") @db.Decimal(20, 6)
+  thresholdValue  Decimal  @map("threshold_value") @db.Decimal(20, 6)
+  condition       String
+  severity        String
+  emailsSent      String[] @default([]) @map("emails_sent")
+  notifiedAt      DateTime @default(now()) @map("notified_at") @db.Timestamptz(6)
+  alert           Alert    @relation(fields: [alertId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  campaign        Campaign @relation(fields: [campaignId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenant          Agency   @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenantId, alertId], map: "idx_alert_events_alert")
+  @@index([tenantId, campaignId, notifiedAt(sort: Desc)], map: "idx_alert_events_campaign")
+  @@map("alert_events")
+}
+
+model CustomMetricDefinition {
+  id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId      String              @map("tenant_id") @db.Uuid
+  name          String              @db.VarChar(100)
+  formula       String
+  variableKeys  String[]            @default([]) @map("variable_keys")
+  platform      IntegrationPlatform
+  isActive      Boolean             @default(true) @map("is_active")
+  createdById   String              @map("created_by_id") @db.Uuid
+  createdAt     DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime            @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt     DateTime?           @map("deleted_at") @db.Timestamptz(6)
+  tenant        Agency              @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy     User                @relation("CustomMetricCreatedBy", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenantId, platform, deletedAt], map: "idx_custom_metrics_tenant")
+  @@map("custom_metric_definitions")
+}
+
+// ─── Phase 8.11: Template Marketplace ─────────────────────────────────────────
+
+model DashboardTemplate {
+  id           String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String               @db.VarChar(255)
+  description  String?
+  category     String?              @db.VarChar(100)
+  platform     IntegrationPlatform?
+  thumbnailUrl String?              @map("thumbnail_url") @db.VarChar(1000)
+  widgets      Json                 @default("[]")
+  isActive     Boolean              @default(true) @map("is_active")
+  cloneCount   Int                  @default(0) @map("clone_count")
+  createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([category, platform, isActive], map: "idx_dashboard_templates_category")
+  @@map("dashboard_templates")
+}
+
+model ReportTemplate {
+  id           String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String               @db.VarChar(255)
+  description  String?
+  category     String?              @db.VarChar(100)
+  platform     IntegrationPlatform?
+  thumbnailUrl String?              @map("thumbnail_url") @db.VarChar(1000)
+  sections     Json                 @default("[]")
+  isActive     Boolean              @default(true) @map("is_active")
+  cloneCount   Int                  @default(0) @map("clone_count")
+  createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([category, platform, isActive], map: "idx_report_templates_category")
+  @@map("report_templates")
+}
+
+// ─── Notifications ───────────────────────────────────────────────────────────
+
+model Notification {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId     String    @map("tenant_id") @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  type         String    @db.VarChar(50)
+  title        String    @db.VarChar(255)
+  message      String?   @db.Text
+  resourceType String?   @map("resource_type") @db.VarChar(100)
+  resourceId   String?   @map("resource_id") @db.VarChar(255)
+  isRead       Boolean   @default(false) @map("is_read")
+  readAt       DateTime? @map("read_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([tenantId, userId, isRead, createdAt(sort: Desc)], map: "idx_notifications_user_unread")
+  @@map("notifications")
+}
+
+// ─── Audit Log ───────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId     String    @map("tenant_id") @db.Uuid
+  userId       String?   @map("user_id") @db.Uuid
+  userEmail    String?   @map("user_email") @db.VarChar(255)
+  action       String    @db.VarChar(50)
+  resourceType String    @map("resource_type") @db.VarChar(100)
+  resourceId   String?   @map("resource_id") @db.VarChar(255)
+  resourceName String?   @map("resource_name") @db.VarChar(255)
+  metadata     Json?
+  ipAddress    String?   @map("ip_address") @db.VarChar(100)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([tenantId, createdAt(sort: Desc)], map: "idx_audit_logs_tenant_created")
+  @@index([tenantId, resourceType, createdAt(sort: Desc)], map: "idx_audit_logs_tenant_resource")
+  @@index([tenantId, userId, createdAt(sort: Desc)], map: "idx_audit_logs_tenant_user")
+  @@map("audit_logs")
+}
+
+// ─── Phase 8.12: Billing ──────────────────────────────────────────────────────
+
+model BillingEvent {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId       String?   @map("tenant_id") @db.Uuid
+  stripeEventId  String    @unique @map("stripe_event_id") @db.VarChar(255)
+  eventType      String    @map("event_type") @db.VarChar(100)
+  data           Json
+  processedAt    DateTime? @map("processed_at") @db.Timestamptz(6)
+  error          String?
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  tenant         Agency?   @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenantId, createdAt(sort: Desc)], map: "idx_billing_events_tenant")
+  @@index([eventType, createdAt(sort: Desc)], map: "idx_billing_events_type")
+  @@map("billing_events")
+}
+
+// ─── Phase 8.5: AI Assistant ──────────────────────────────────────────────────
+
+model AiConversation {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId     String      @map("tenant_id") @db.Uuid
+  userId       String      @map("user_id") @db.Uuid
+  campaignId   String      @map("campaign_id") @db.Uuid
+  title        String      @default("New Conversation") @db.VarChar(255)
+  messageCount Int         @default(0) @map("message_count")
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime?   @map("deleted_at") @db.Timestamptz(6)
+  tenant       Agency      @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user         User        @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  campaign     Campaign    @relation(fields: [campaignId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  messages     AiMessage[]
+
+  @@index([tenantId, userId, updatedAt(sort: Desc)], map: "idx_ai_conversations_user")
+  @@index([tenantId, campaignId, deletedAt], map: "idx_ai_conversations_campaign")
+  @@map("ai_conversations")
+}
+
+model AiMessage {
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId       String         @map("tenant_id") @db.Uuid
+  conversationId String         @map("conversation_id") @db.Uuid
+  role           String         @db.VarChar(20)
+  content        String
+  tokenCount     Int?           @map("token_count")
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  tenant         Agency         @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  conversation   AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([conversationId, createdAt], map: "idx_ai_messages_conversation")
+  @@map("ai_messages")
+}

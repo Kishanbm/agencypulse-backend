@@ -1,0 +1,280 @@
+AgencyAnalytics Clone 
+Product Blueprint & Technical Specification 
+Version 1.0  |  April 2026 
+1. Product Overview 
+AgencyAnalytics is a SaaS platform built for digital marketing agencies. It aggregates data from 
+dozens of marketing channels into unified dashboards and automated client reports. The clone 
+must replicate its core value propositions: white-labelled client portals, automated reporting, 
+multi-integration data pulls, AI-powered insights, and multi-role access control. 
+Product Type 
+Primary Users 
+Core Value Prop 
+Monetisation 
+B2B SaaS – Marketing Reporting & Client Management 
+Marketing Agencies, Freelancers, In-house Teams 
+Automated white-label reports + unified marketing dashboards 
+Subscription tiers (per campaign/client) 
+Tech Complexity 
+High – 80+ third-party API integrations 
+2. User Roles & Permissions 
+The platform has four distinct roles. Each has a scoped set of capabilities to protect client data 
+and agency IP. 
+2.1  Super Admin (Agency Owner) 
+The top-level account holder. Has unrestricted access to all settings, billing, integrations, and 
+client data across the entire workspace. 
+• Create, edit, delete all client campaigns 
+• Manage all staff and client user accounts 
+• Connect/disconnect third-party integrations 
+• Configure white-label branding (logo, custom domain, colours) 
+• Access billing, subscription, and plan management 
+• Set global report templates and default dashboards 
+• View and export all data across all clients 
+• Configure API keys and webhook endpoints 
+2.2  Staff / Team Member 
+Agency employees assigned to specific client accounts by the Admin. Cannot access billing or 
+agency-wide settings. 
+• View and manage assigned client campaigns only 
+• Build and schedule reports for assigned clients 
+• Add/edit dashboard widgets within assigned clients 
+• Invite client users (with Admin approval toggle) 
+• Connect integrations for their assigned accounts 
+• Cannot see unassigned client data 
+• Cannot modify agency-wide settings or billing 
+2.3  Client User (Read-Only Portal) 
+The end-client of the agency. Accesses a branded portal that shows only their own data. Cannot 
+see other clients or agency internal settings. 
+• Log in to white-labelled client portal 
+• View live dashboards in read-only mode 
+• Download or view scheduled reports 
+• See tasks and notes left by the agency 
+• Optionally comment on reports if enabled by Admin 
+• Cannot edit dashboards, connect integrations, or see billing 
+2.4  Report Viewer (Guest / No-Login) 
+A shareable, token-gated view for clients who do not have a full login. Access is via a unique 
+link with an optional password. 
+• View a single shared report or dashboard via URL 
+• No account required 
+• Link can be password-protected or set with an expiry date 
+• Zero access to any other part of the platform 
+2.5  Permissions Matrix 
+Feature 
+Super Admin Staff 
+Billing & Plans 
+White-label Settings 
+✅
+❌
+Client User 
+❌
+Report 
+Viewer 
+❌
+✅
+All Client Data 
+Create Reports 
+✅
+❌
+❌
+Assigned only Own only 
+❌
+❌
+✅
+✅
+View Reports 
+Connect Integrations 
+✅
+✅
+❌
+✅
+❌
+✅
+✅
+Manage Staff Users 
+API Key Management 
+✅
+✅
+(assigned) 
+❌
+ 
+❌
+❌
+❌
+❌
+✅
+Comment on Reports 
+✅
+❌
+✅
+❌
+Optional 
+❌
+❌
+3. Core User Flows 
+3.1  Agency Onboarding Flow 
+• Agency owner visits marketing site → clicks 'Start Free Trial' 
+• Enters email, agency name, password → email verification sent 
+• Completes onboarding wizard: agency size, services offered, first client name 
+• Connects first integration (e.g. Google Analytics) via OAuth 
+• Auto-generates a starter dashboard from connected data 
+• Prompted to invite first staff member or share client portal link 
+3.2  Client Campaign Setup Flow 
+• Admin/Staff clicks 'Add Campaign' in sidebar 
+• Enters campaign name, client name, website URL, timezone 
+• Selects integrations to connect (GA4, Google Ads, Meta Ads, etc.) 
+• OAuth handshake per integration — tokens stored encrypted 
+• System runs first data sync and populates dashboard with live widgets 
+• Admin assigns staff members to the campaign 
+• Admin optionally creates client user login and sends branded invite email 
+3.3  Report Creation & Delivery Flow 
+• User navigates to 'Reports' tab within a campaign 
+• Clicks 'Create Report' → chooses blank or template 
+• Drag-and-drop report builder: add widgets, text blocks, images, goals 
+• Configures date range, comparison period, branding 
+• Preview report → approve or iterate 
+• Schedules delivery: Daily / Weekly / Monthly → selects recipients 
+• System auto-generates PDF or web report on schedule and emails it 
+• Client can also view live web version in their portal at any time 
+3.4  Client Portal Access Flow 
+• Agency enables client portal for a campaign 
+• Client receives branded email invitation (from agency's custom domain) 
+• Client sets password → lands on white-labelled portal dashboard 
+• Client views live metrics, downloads past reports, sees task notes 
+• Client cannot see any other agency data or settings 
+3.5  Integration Connection Flow 
+• User navigates to Integrations panel within a campaign 
+• Searches or browses 80+ available integrations 
+• Clicks 'Connect' on desired integration 
+• OAuth 2.0 redirect to third-party auth page 
+• User grants permissions → redirected back with access token 
+• Platform stores encrypted token, begins first data pull 
+• Dashboard auto-populates relevant widgets 
+• Reconnect/disconnect available at any time 
+4. Dashboard Architecture 
+4.1  Agency Overview Dashboard 
+Visible only to Super Admin and Staff. Aggregates data across all client campaigns. 
+• Total campaigns active 
+• Campaigns with anomaly alerts (performance dips) 
+• Upcoming scheduled report deliveries 
+• New client invites pending 
+• Integration health status (connected / disconnected / token expired) 
+• Quick-access links to top 5 most recently edited campaigns 
+4.2  Campaign Dashboard (Per Client) 
+The main workspace for a single client. Fully customisable with drag-and-drop widgets. 
+Default Widget Categories 
+• SEO: Organic traffic, keyword rankings, backlinks, Core Web Vitals 
+• PPC / Google Ads: Impressions, clicks, CTR, CPC, conversions, ROAS 
+• Social Media: Followers, reach, engagement rate, post performance 
+• Email Marketing: Open rate, click rate, unsubscribes, conversions 
+• Analytics: Sessions, bounce rate, goal completions, page views 
+• Local: Google Business Profile views, calls, direction requests 
+• E-commerce: Revenue, transactions, AOV, conversion rate 
+Dashboard Features 
+• Date range picker with comparison period 
+• Widget resize and reorder (drag and drop) 
+• Widget-level drill-down to raw data 
+• Anomaly highlight (red/green delta indicators) 
+• AI Insights panel: natural language summaries per widget 
+• Save multiple named dashboard views per campaign 
+4.3  Client Portal Dashboard 
+A simplified, read-only version of the campaign dashboard seen by the client user. Agency 
+controls which widgets are visible. 
+• Shows only widgets the agency has chosen to expose 
+• Agency branding: logo, colour scheme, custom domain 
+• No editing controls visible 
+• Report download panel (past reports listed chronologically) 
+• Notes / tasks section for agency-client communication 
+4.4  Report Builder 
+A separate drag-and-drop canvas for building PDF/web reports. 
+• Sections: Cover page, executive summary, KPI metrics, charts, commentary 
+• All widgets available in dashboards are also available in reports 
+• Text editor blocks for agency commentary (supports rich text) 
+• Goal vs actual comparison blocks 
+• Industry benchmark comparison blocks 
+• Logo, colour, and font customisation per template 
+• White-label: remove all AgencyAnalytics branding 
+5. Third-Party API Keys Required 
+The following integrations are required to replicate AgencyAnalytics. Keys are obtained by 
+registering as a developer with each platform. All access tokens must be stored encrypted at 
+rest (AES-256). 
+ 
+5.1  Analytics 
+Integration Auth Method Where to Get Key 
+Google Analytics 4 OAuth 2.0 console.cloud.google.com 
+Google Search 
+Console 
+OAuth 2.0 console.cloud.google.com 
+Adobe Analytics OAuth 2.0 / API Key developer.adobe.com 
+ 
+5.2  Paid Advertising 
+Integration Auth Method Where to Get Key 
+Google Ads OAuth 2.0 + Developer 
+Token 
+ads.google.com/intl/en_uk/home/tool
+s/manager-accounts/ 
+Meta Ads 
+(Facebook/Instagram
+) 
+OAuth 2.0 developers.facebook.com 
+Microsoft/Bing Ads OAuth 2.0 ads.microsoft.com 
+LinkedIn Ads OAuth 2.0 developer.linkedin.com 
+Twitter/X Ads OAuth 2.0 developer.twitter.com 
+TikTok Ads OAuth 2.0 ads.tiktok.com/marketing_api 
+Snapchat Ads OAuth 2.0 businesshelp.snapchat.com 
+Pinterest Ads OAuth 2.0 developers.pinterest.com 
+ 
+5.3  SEO 
+Integration Auth Method Where to Get Key 
+SEMrush API Key semrush.com/api 
+Ahrefs API Key (v3) ahrefs.com/api 
+Moz API Key + Secret moz.com/products/api 
+Integration Auth Method Where to Get Key 
+Majestic API Key majestic.com/api 
+ 
+5.4  Social Media (Organic) 
+Integration Auth Method Where to Get Key 
+Facebook Pages OAuth 2.0 developers.facebook.com 
+Instagram Business OAuth 2.0 (via Meta) developers.facebook.com 
+LinkedIn Pages OAuth 2.0 developer.linkedin.com 
+Twitter/X OAuth 2.0 developer.twitter.com 
+YouTube OAuth 2.0 console.cloud.google.com 
+TikTok OAuth 2.0 developers.tiktok.com 
+ 
+5.5  Email Marketing 
+Integration Auth Method Where to Get Key 
+Mailchimp OAuth 2.0 mailchimp.com/developer 
+Klaviyo API Key developers.klaviyo.com 
+ActiveCampaign API Key + URL youraccnt.api-us1.com 
+HubSpot Email OAuth 2.0 developers.hubspot.com 
+Campaign Monitor API Key campaignmonitor.com/api 
+ 
+5.6  Local & Maps 
+Integration Auth Method Where to Get Key 
+Google Business 
+Profile 
+OAuth 2.0 console.cloud.google.com 
+BrightLocal API Key brightlocal.com/api 
+ 
+5.7  E-commerce 
+Integration Auth Method Where to Get Key 
+Shopify OAuth 2.0 partners.shopify.com 
+Integration Auth Method Where to Get Key 
+WooCommerce Consumer Key/Secret WooCommerce Settings > REST API 
+Stripe API Key (Secret) dashboard.stripe.com/apikeys 
+ 
+5.8  Internal / Infrastructure Keys 
+Service Purpose Where to Get 
+Stripe Subscription billing dashboard.stripe.com 
+GoHighLevel (GHL) All outbound email (reports, 
+invites, alerts, notifications) 
+Settings → Integrations → API Keys 
+in GHL 
+AWS S3 / Cloudflare 
+R2 
+Report PDF storage aws.amazon.com / cloudflare.com 
+OpenAI / Anthropic AI Insights feature platform.openai.com / 
+console.anthropic.com 
+Puppeteer / 
+Headless Chrome 
+PDF report rendering Self-hosted 
+Redis Job queue + caching upstash.com or self-hosted 
+Sentry Error monitoring sentry.io 
+PostHog / Mixpanel Product analytics posthog.com / mixpanel.com 

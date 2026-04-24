@@ -1,0 +1,132 @@
+7 CRITICAL Fixes (Do BEFORE Implementation)
+
+These are not optional — they will bite later.
+
+❗ 1. Alert jobId design is WRONG (subtle but important)
+
+You wrote:
+
+jobId = alert:${alertId}:${todayDateStr}
+
+👉 Problem:
+
+❌ ignores platform + period_type
+❌ weekly alerts may not run correctly
+Fix:
+jobId = alert:${alertId}:${periodType}:${dateStr}
+❗ 2. PERCENT_CHANGE divide-by-zero bug
+
+You wrote:
+
+(current - prior) / prior
+
+👉 Problem:
+
+prior = 0 → crash / Infinity
+Fix:
+if (prior === 0) → skip OR treat as NEW
+❗ 3. Alert spam risk (very real)
+
+Even with cooldown:
+
+❌ multiple alerts on same metric
+❌ many emails per sync
+Fix (important):
+
+Batch email per campaign:
+
+1 email per campaign:
+- Alert 1 triggered
+- Alert 2 triggered
+- Alert 3 triggered
+❗ 4. Forecast linear regression stability
+
+OLS is fine, but:
+
+❌ very sensitive to outliers
+❌ noisy data = bad slope
+Fix:
+✔ clamp extreme outliers (optional)
+✔ OR expose r2 < 0.3 → "low confidence"
+❗ 5. KPI Engine variable validation incomplete
+
+You wrote:
+
+variable_keys TEXT[]
+
+👉 Missing validation:
+
+❌ formula references metric that doesn't exist
+Fix:
+
+At creation time:
+
+✔ verify all variables exist in metric_definitions
+✔ reject invalid formulas
+❗ 6. Export memory risk (important)
+
+You wrote:
+
+365 days cap
+
+👉 Still risky:
+
+365 days × 20 metrics = large memory
+Fix:
+✔ stream row-by-row (not full array in memory)
+✔ especially for CSV
+❗ 7. Alert evaluation inefficiency
+
+Current:
+
+loop alerts → call getMetricSummary per alert
+
+👉 Problem:
+
+❌ N+1 queries
+Fix (important):
+group alerts by:
+- platform
+- metricKeys
+- period
+
+call getMetricSummary ONCE per group
+🧠 Minor but High-Value Improvements
+🔸 Alert severity levels
+
+Add:
+
+severity ENUM(INFO, WARNING, CRITICAL)
+🔸 KPI caching key consistency
+
+Use:
+
+kpi:${tenantId}:${campaignId}:${platform}:${from}:${to}
+🔸 Export filename safety
+
+Sanitize:
+
+campaign-name → no spaces/special chars
+🔸 Forecast direction threshold
+
+You wrote:
+
+|slope / mean| < 0.02
+
+✔ Good — keep it
+
+
+CRITICAL FIXES (DO BEFORE STARTING)
+❗ 1. Alerts queue explosion risk
+Problem:
+
+Every sync → enqueue job
+
+✅ Fix:
+Writing
+
+Add dedup per campaign + platform:
+
+jobId = alert-check:{tenantId}:{campaignId}:{platform}:{date}
+
+Prevents duplicate checks.

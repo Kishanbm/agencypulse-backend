@@ -1,0 +1,164 @@
+-- Migration: Strict RLS + register_agency SECURITY DEFINER function
+--
+-- Reverts the split per-command policies introduced in 000004 (which had
+-- open INSERT WITH CHECK (true) to allow auth ops without tenant context).
+-- Instead, all tables use a single strict FOR ALL policy — INSERTs must
+-- also satisfy the tenant check, just like SELECT/UPDATE/DELETE.
+--
+-- Auth operations that must run without a tenant context (register, login,
+-- refresh) are handled exclusively via SECURITY DEFINER functions that
+-- execute as the owner role (bypasses RLS), never via agencypulse_app
+-- direct INSERT/SELECT.
+--
+-- The agencypulse_app role is created by scripts/setup-db-role.sql.
+
+-- ─── Drop all policies from migration 000004 ──────────────────────────────────
+
+DROP POLICY IF EXISTS agencies_select  ON agencies;
+DROP POLICY IF EXISTS agencies_update  ON agencies;
+DROP POLICY IF EXISTS agencies_delete  ON agencies;
+DROP POLICY IF EXISTS agencies_insert  ON agencies;
+
+DROP POLICY IF EXISTS users_select     ON users;
+DROP POLICY IF EXISTS users_update     ON users;
+DROP POLICY IF EXISTS users_delete     ON users;
+DROP POLICY IF EXISTS users_insert     ON users;
+
+DROP POLICY IF EXISTS refresh_tokens_select ON refresh_tokens;
+DROP POLICY IF EXISTS refresh_tokens_update ON refresh_tokens;
+DROP POLICY IF EXISTS refresh_tokens_delete ON refresh_tokens;
+DROP POLICY IF EXISTS refresh_tokens_insert ON refresh_tokens;
+
+DROP POLICY IF EXISTS clients_isolation              ON clients;
+DROP POLICY IF EXISTS campaigns_isolation            ON campaigns;
+DROP POLICY IF EXISTS staff_client_assignments_isolation ON staff_client_assignments;
+
+-- Also drop any stale policies from earlier migrations targeting agencypulse_app
+DROP POLICY IF EXISTS agencies_isolation              ON agencies;
+DROP POLICY IF EXISTS users_isolation                 ON users;
+DROP POLICY IF EXISTS refresh_tokens_isolation        ON refresh_tokens;
+
+-- ─── Strict FOR ALL policies targeting agencypulse_app ───────────────────────
+-- Every table: SELECT, INSERT, UPDATE, DELETE all require tenant context.
+-- No open INSERT holes. Auth ops go through SECURITY DEFINER functions only.
+
+CREATE POLICY agencies_isolation ON agencies
+  FOR ALL TO agencypulse_app
+  USING  (current_tenant_id() IS NOT NULL AND id = current_tenant_id())
+  WITH CHECK (current_tenant_id() IS NOT NULL AND id = current_tenant_id());
+
+CREATE POLICY users_isolation ON users
+  FOR ALL TO agencypulse_app
+  USING  (current_tenant_id() IS NOT NULL AND tenant_id = current_tenant_id())
+  WITH CHECK (current_tenant_id() IS NOT NULL AND tenant_id = current_tenant_id());
+
+CREATE POLICY refresh_tokens_isolation ON refresh_tokens
+  FOR ALL TO agencypulse_app
+  USING  (current_tenant_id() IS NOT NULL AND tenant_id = current_tenant_id())
+  WITH CHECK (current_tenant_id() IS NOT NULL AND tenant_id = current_tenant_id());
+
+CREATE POLICY clients_isolation ON clients
+  FOR ALL TO agencypulse_app
+  USING  (current_tenant_id() IS NOT NULL AND tenant_id = current_tenant_id())
+  WITH CHECK (current_tenant_id() IS NOT NULL AND tenant_id = current_tenant_id());
+
+CREATE POLICY campaigns_isolation ON campaigns
+  FOR ALL TO agencypulse_app
+  USING  (current_tenant_id() IS NOT NULL AND tenant_id = current_tenant_id())
+  WITH CHECK (current_tenant_id() IS NOT NULL AND tenant_id = current_tenant_id());
+
+CREATE POLICY staff_client_assignments_isolation ON staff_client_assignments
+  FOR ALL TO agencypulse_app
+  USING  (current_tenant_id() IS NOT NULL AND tenant_id = current_tenant_id())
+  WITH CHECK (current_tenant_id() IS NOT NULL AND tenant_id = current_tenant_id());
+
+-- ─── Grant current_tenant_id() to agencypulse_app ────────────────────────────
+GRANT EXECUTE ON FUNCTION current_tenant_id() TO agencypulse_app;
+
+-- ─── Grant existing SECURITY DEFINER functions to agencypulse_app ─────────────
+-- find_user_for_login and find_refresh_token were previously only granted to
+-- agencypulse. Grant them to agencypulse_app so the app role can call them.
+GRANT EXECUTE ON FUNCTION find_user_for_login(VARCHAR)  TO agencypulse_app;
+GRANT EXECUTE ON FUNCTION find_refresh_token(VARCHAR)   TO agencypulse_app;
+
+-- ─── register_agency SECURITY DEFINER function ───────────────────────────────
+-- Used by: AuthService.register()
+--
+-- Creates a new agency + owner user atomically. Runs as the function owner
+-- (agencypulse — table owner, bypasses RLS) so neither the agency insert nor
+-- the user insert is subject to tenant-context checks.
+--
+-- Why SECURITY DEFINER instead of using systemPrisma ORM?
+--   This is the only path that inserts rows without a tenant context.
+--   Keeping it in a DB function means the bypass is narrow, auditable, and
+--   version-controlled. The function receives only the fields it needs and
+--   returns only the fields the app needs — no arbitrary SQL injection surface.
+--
+-- Parameters:
+--   p_agency_name  — display name of the new agency
+--   p_slug         — pre-validated unique slug (generated by app layer)
+--   p_email        — owner's email (already lowercased by app layer)
+--   p_password_hash — bcrypt hash of the owner's password
+--   p_first_name   — owner's first name
+--   p_last_name    — owner's last name
+--
+-- Returns one row: agency_id, user_id, agency_slug, agency_plan
+-- The app uses these to build the JWT payload and response DTO.
+--
+-- Uniqueness:
+--   Relies on DB UNIQUE constraints on agencies.slug and users.email.
+--   On violation, raises the constraint error — app catches P2002 / SQLSTATE 23505.
+
+CREATE OR REPLACE FUNCTION register_agency(
+  p_agency_name  TEXT,
+  p_slug         TEXT,
+  p_email        TEXT,
+  p_password_hash TEXT,
+  p_first_name   TEXT,
+  p_last_name    TEXT
+)
+RETURNS TABLE (
+  agency_id    UUID,
+  user_id      UUID,
+  agency_slug  TEXT,
+  agency_plan  agency_plan
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_agency_id UUID;
+  v_user_id   UUID;
+  v_plan      agency_plan := 'FREELANCER';
+BEGIN
+  -- Insert agency (ownerId set after user is created)
+  INSERT INTO agencies (name, slug, plan, is_active)
+  VALUES (p_agency_name, p_slug, v_plan, TRUE)
+  RETURNING id INTO v_agency_id;
+
+  -- Insert owner user
+  INSERT INTO users (
+    tenant_id, email, password_hash,
+    first_name, last_name, role, is_active, email_verified_at
+  )
+  VALUES (
+    v_agency_id, p_email, p_password_hash,
+    p_first_name, p_last_name, 'AGENCY_OWNER', TRUE, NOW()
+  )
+  RETURNING id INTO v_user_id;
+
+  -- Link owner back to agency
+  UPDATE agencies SET owner_id = v_user_id WHERE id = v_agency_id;
+
+  RETURN QUERY SELECT v_agency_id, v_user_id, p_slug, v_plan;
+END;
+$$;
+
+COMMENT ON FUNCTION register_agency(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) IS
+  'SECURITY DEFINER: creates a new agency + owner user atomically, bypassing RLS. '
+  'Called exclusively by AuthService.register() before any tenant context exists. '
+  'Returns agency_id, user_id, agency_slug, agency_plan.';
+
+GRANT EXECUTE ON FUNCTION register_agency(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT)
+  TO agencypulse_app;
