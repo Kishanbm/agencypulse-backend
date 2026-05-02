@@ -78,6 +78,7 @@ import { RolesGuard } from './modules/auth/guards/roles.guard';
           host: config.get<string>('redis.host'),
           port: config.get<number>('redis.port'),
           password: config.get<string>('redis.password'),
+          ...(process.env.REDIS_TLS === 'true' ? { tls: {} } : {}),
         },
       }),
     }),

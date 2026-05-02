@@ -17,6 +17,7 @@ export class CacheService implements OnModuleDestroy {
       enableOfflineQueue: false,
       // AI2 fix: prevent requests hanging when Redis is down
       maxRetriesPerRequest: 1,
+      ...(process.env.REDIS_TLS === 'true' ? { tls: {} } : {}),
     });
 
     this.redis.on('error', (err: Error) => {
