@@ -1,0 +1,23 @@
+{
+  "ratingData": [
+    {
+      "date": "2024-03-01",
+      "avgRating": 4.3,
+      "reviewCount": 8,
+      "newReviews": 8,
+      "respondedReviews": 5
+    },
+    {
+      "date": "2024-03-02",
+      "avgRating": 4.5,
+      "reviewCount": 11,
+      "newReviews": 3,
+      "respondedReviews": 3
+    }
+  ],
+  "summary": {
+    "businessId": 77654321,
+    "overallRating": 4.4,
+    "totalReviews": 587
+  }
+}

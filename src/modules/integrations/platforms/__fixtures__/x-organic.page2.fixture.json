@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "id": "1763000000000000004",
+      "text": "Wrapping up the week with some insights.",
+      "created_at": "2024-03-02T17:00:00.000Z",
+      "public_metrics": {
+        "retweet_count": 35,
+        "reply_count": 12,
+        "like_count": 198,
+        "quote_count": 9,
+        "impression_count": 11300
+      }
+    }
+  ],
+  "meta": {
+    "newest_id": "1763000000000000004",
+    "oldest_id": "1763000000000000004",
+    "result_count": 1,
+    "next_token": null
+  }
+}

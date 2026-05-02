@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class GoogleAdsCallbackDto {
   @IsString()
@@ -6,4 +6,16 @@ export class GoogleAdsCallbackDto {
 
   @IsString()
   state: string;
+
+  @IsOptional() @IsString()
+  scope?: string;
+
+  @IsOptional() @IsString()
+  authuser?: string;
+
+  @IsOptional() @IsString()
+  prompt?: string;
+
+  @IsOptional() @IsString()
+  iss?: string;
 }

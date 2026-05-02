@@ -96,7 +96,7 @@ export class NotificationsService {
     const skip = (page - 1) * limit;
 
     const where: any = { tenantId: user.tenantId, userId: user.id };
-    if (dto.isRead !== undefined) where.isRead = dto.isRead;
+    if (dto.isRead !== undefined) where.isRead = dto.isRead === 'true';
 
     const [items, total, unreadCount] = await Promise.all([
       this.prisma.notification.findMany({
@@ -154,5 +154,16 @@ export class NotificationsService {
     });
 
     return { message: 'All notifications marked as read.' };
+  }
+
+  async delete(user: AuthenticatedUser, notificationId: string) {
+    const existing = await this.prisma.notification.findFirst({
+      where: { id: notificationId, tenantId: user.tenantId, userId: user.id },
+      select: { id: true },
+    });
+    if (!existing) throw new NotFoundException('Notification not found.');
+
+    await this.prisma.notification.delete({ where: { id: notificationId } });
+    return { message: 'Notification deleted.' };
   }
 }

@@ -1,0 +1,29 @@
+{
+  "Code": 200,
+  "Status": "OK",
+  "GlobalVars": {
+    "TotalResults": 1
+  },
+  "DataTables": {
+    "Results": {
+      "Headers": [
+        "Item",
+        "TrustFlow",
+        "CitationFlow",
+        "RefDomains",
+        "RefIPs",
+        "ExtBackLinks"
+      ],
+      "Data": [
+        {
+          "Item": "https://example.com",
+          "TrustFlow": 42,
+          "CitationFlow": 51,
+          "RefDomains": 1920,
+          "RefIPs": 1540,
+          "ExtBackLinks": 48700
+        }
+      ]
+    }
+  }
+}

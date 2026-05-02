@@ -1,0 +1,24 @@
+{
+  "statementHandle": "snowflake-stmt-handle-abc123xyz",
+  "message": "Statement executed successfully.",
+  "createdOn": 1709251200000,
+  "statementStatusUrl": "https://myorg-myaccount.snowflakecomputing.com/api/v2/statements/snowflake-stmt-handle-abc123xyz",
+  "resultSetMetaData": {
+    "numRows": 4,
+    "format": "jsonv2",
+    "rowType": [
+      { "name": "DATE",       "type": "TEXT",   "length": 16777216, "nullable": true },
+      { "name": "METRIC_KEY", "type": "TEXT",   "length": 16777216, "nullable": true },
+      { "name": "VALUE",      "type": "REAL",   "byteLength": 8,    "nullable": true }
+    ]
+  },
+  "data": [
+    ["2024-03-01", "page_views",   "8420"],
+    ["2024-03-01", "new_signups",  "134"],
+    ["2024-03-02", "page_views",   "9100"],
+    ["2024-03-02", "new_signups",  "148"]
+  ],
+  "code": "090001",
+  "sqlState": "00000",
+  "status": "success"
+}

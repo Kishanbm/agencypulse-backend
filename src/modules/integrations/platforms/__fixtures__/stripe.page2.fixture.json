@@ -1,0 +1,28 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "ch_3OxJKL1234567893",
+      "object": "charge",
+      "amount": 14900,
+      "captured": true,
+      "refunded": false,
+      "amount_captured": 14900,
+      "amount_refunded": 0,
+      "currency": "usd",
+      "status": "succeeded",
+      "created": 1709380800,
+      "paid": true,
+      "description": "Professional plan",
+      "customer": "cus_JKL012MNO345",
+      "balance_transaction": {
+        "id": "txn_3OxJKL1234567893",
+        "amount": 14900,
+        "net": 14467,
+        "fee": 433
+      }
+    }
+  ],
+  "has_more": false,
+  "url": "/v1/charges"
+}

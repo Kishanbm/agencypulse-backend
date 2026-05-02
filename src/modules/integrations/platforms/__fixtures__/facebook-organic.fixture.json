@@ -1,0 +1,68 @@
+{
+  "data": [
+    {
+      "id": "123456789012345/insights/page_impressions/day",
+      "name": "page_impressions",
+      "period": "day",
+      "values": [
+        {
+          "value": 8420,
+          "end_time": "2024-03-02T07:00:00+0000"
+        },
+        {
+          "value": 9100,
+          "end_time": "2024-03-03T07:00:00+0000"
+        }
+      ]
+    },
+    {
+      "id": "123456789012345/insights/page_reach/day",
+      "name": "page_reach",
+      "period": "day",
+      "values": [
+        {
+          "value": 6340,
+          "end_time": "2024-03-02T07:00:00+0000"
+        },
+        {
+          "value": 6890,
+          "end_time": "2024-03-03T07:00:00+0000"
+        }
+      ]
+    },
+    {
+      "id": "123456789012345/insights/page_engaged_users/day",
+      "name": "page_engaged_users",
+      "period": "day",
+      "values": [
+        {
+          "value": 1240,
+          "end_time": "2024-03-02T07:00:00+0000"
+        },
+        {
+          "value": 1380,
+          "end_time": "2024-03-03T07:00:00+0000"
+        }
+      ]
+    },
+    {
+      "id": "123456789012345/insights/page_post_engagements/day",
+      "name": "page_post_engagements",
+      "period": "day",
+      "values": [
+        {
+          "value": 2180,
+          "end_time": "2024-03-02T07:00:00+0000"
+        },
+        {
+          "value": 2430,
+          "end_time": "2024-03-03T07:00:00+0000"
+        }
+      ]
+    }
+  ],
+  "paging": {
+    "previous": "https://graph.facebook.com/v19.0/123456789012345/insights?metric=page_impressions&period=day&since=1709164800",
+    "next": null
+  }
+}

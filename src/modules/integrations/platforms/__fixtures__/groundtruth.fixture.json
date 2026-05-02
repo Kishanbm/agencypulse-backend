@@ -1,0 +1,25 @@
+{
+  "data": [
+    {
+      "date": "2024-03-01",
+      "advertiser_id": "gt-adv-55001",
+      "impressions": 38400,
+      "clicks": 820,
+      "spend": 492.30,
+      "visits": 214
+    },
+    {
+      "date": "2024-03-02",
+      "advertiser_id": "gt-adv-55001",
+      "impressions": 40100,
+      "clicks": 862,
+      "spend": 517.80,
+      "visits": 228
+    }
+  ],
+  "meta": {
+    "total": 2,
+    "start_date": "2024-03-01",
+    "end_date": "2024-03-31"
+  }
+}

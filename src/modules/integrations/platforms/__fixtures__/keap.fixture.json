@@ -1,0 +1,30 @@
+{
+  "orders": [
+    {
+      "id": 1001001,
+      "order_date": "2024-03-01T08:30:00.000Z",
+      "status": "Paid",
+      "total": 249.00,
+      "contact_id": 500001,
+      "title": "Pro Plan - Monthly"
+    },
+    {
+      "id": 1001002,
+      "order_date": "2024-03-01T13:15:00.000Z",
+      "status": "Paid",
+      "total": 99.00,
+      "contact_id": 500002,
+      "title": "Starter Plan - Monthly"
+    },
+    {
+      "id": 1001003,
+      "order_date": "2024-03-02T10:00:00.000Z",
+      "status": "Paid",
+      "total": 499.00,
+      "contact_id": 500003,
+      "title": "Enterprise Plan - Monthly"
+    }
+  ],
+  "count": 3,
+  "next": null
+}

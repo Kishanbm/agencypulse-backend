@@ -1,0 +1,41 @@
+{
+  "calls": [
+    {
+      "id": "CAL8154748d001",
+      "direction": "inbound",
+      "answered": true,
+      "start_time": "2024-03-01T09:15:22.000Z",
+      "duration": 247,
+      "caller_id": "+15551234567",
+      "tracking_phone_number": "+15559876543",
+      "first_call": true,
+      "disposition": "completed"
+    },
+    {
+      "id": "CAL8154748d002",
+      "direction": "inbound",
+      "answered": false,
+      "start_time": "2024-03-01T11:42:05.000Z",
+      "duration": 0,
+      "caller_id": "+15552345678",
+      "tracking_phone_number": "+15559876543",
+      "first_call": false,
+      "disposition": "missed"
+    },
+    {
+      "id": "CAL8154748d003",
+      "direction": "inbound",
+      "answered": true,
+      "start_time": "2024-03-02T14:30:10.000Z",
+      "duration": 312,
+      "caller_id": "+15553456789",
+      "tracking_phone_number": "+15559876543",
+      "first_call": true,
+      "disposition": "completed"
+    }
+  ],
+  "total_records": 3,
+  "page": 1,
+  "per_page": 250,
+  "total_pages": 1
+}

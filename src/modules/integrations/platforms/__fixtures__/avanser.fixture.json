@@ -1,0 +1,40 @@
+{
+  "calls": [
+    {
+      "id": "av-call-10001",
+      "account_id": "av-acct-5001",
+      "date": "2024-03-01",
+      "time": "09:14:22",
+      "status": "answered",
+      "duration": 203,
+      "caller": "+61411234567",
+      "tracking_number": "+61398765432"
+    },
+    {
+      "id": "av-call-10002",
+      "account_id": "av-acct-5001",
+      "date": "2024-03-01",
+      "time": "13:52:10",
+      "status": "missed",
+      "duration": 0,
+      "caller": "+61422345678",
+      "tracking_number": "+61398765432"
+    },
+    {
+      "id": "av-call-10003",
+      "account_id": "av-acct-5001",
+      "date": "2024-03-02",
+      "time": "10:30:45",
+      "status": "answered",
+      "duration": 419,
+      "caller": "+61433456789",
+      "tracking_number": "+61398765432"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "per_page": 100,
+    "total": 3,
+    "total_pages": 1
+  }
+}

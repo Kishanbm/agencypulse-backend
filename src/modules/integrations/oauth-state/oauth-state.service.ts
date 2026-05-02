@@ -7,9 +7,12 @@ import { IntegrationPlatform } from '@prisma/client';
 // platform is included so each callback can verify the flow it initiated.
 export interface OAuthStatePayload {
   campaignId: string;
+  clientId: string;
   tenantId: string;
   userId: string;
   platform: IntegrationPlatform;
+  /** PKCE code_verifier — only set for platforms that require PKCE (e.g. X/Twitter). */
+  pkceVerifier?: string;
 }
 
 /**

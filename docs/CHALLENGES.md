@@ -204,9 +204,64 @@ ALTER TABLE users ADD COLUMN pending_client_id UUID REFERENCES clients(id) ON DE
 
 ---
 
+## CHALLENGE-016: `user.userId` does not exist — `AuthenticatedUser` uses `id`
+**Date**: 2026-04-25
+**Challenge**: `AgencyOverviewController` used `user.userId` to pass the staff filter to the service. TypeScript threw: `Property 'userId' does not exist on type 'AuthenticatedUser'`.
+**Root Cause**: The `@CurrentUser()` decorator returns an `AuthenticatedUser` object whose user-id field is `id`, not `userId`. The property naming is inconsistent with some JWT payload conventions that use `sub` or `userId`, but our decorator normalizes it to `id`.
+**Resolution**: Changed `user.userId` to `user.id` in both places in the controller (the metrics/summary handler and the ranking handler). Verified with `npx tsc --noEmit` — zero errors.
+**Lesson**: Always check the `AuthenticatedUser` interface (in `src/auth/decorators/current-user.decorator.ts`) before using any field. The field is `id`, not `userId` or `sub`.
+
+---
+
+## CHALLENGE-017: `GET /agencies/health` returns no `clientId` — deep-link navigation broken
+**Date**: 2026-04-25
+**Challenge**: The Agency Overview "Fix now" button on health-issue campaigns needs to navigate to `/clients/:clientId/campaigns/:campaignId/integrations`. The `GET /agencies/health` response returns `campaigns[]` with `campaignId`, `campaignName`, status counts — but no `clientId`. Without `clientId`, the deep-link cannot be constructed.
+**Root Cause**: The health endpoint was designed to return integration health status, not full campaign identity. Adding `clientId` to the health DTO would require a JOIN + DTO change + test update, with no benefit to the health endpoint's primary use case.
+**Resolution**: Built a `campaignId→clientId` map client-side from the ranking endpoint response, which already includes `clientId` per row (since ranking JOINs campaigns → clients). `OverviewPage` fetches ranking with `limit=50` for the ranking component; `OverviewHealth` accepts this data as a prop and builds `Record<string, string>` for O(1) lookups. Campaigns that never appear in ranking (zero metric data) fall back to `/clients`. See DECISION-017 for full rationale.
+**Lesson**: When a backend response is missing a field needed for deep-linking, check whether a co-located query (already fetched for another purpose) can supply the missing data before changing the backend. Two network calls can share data via props or React Query's cache without any extra requests.
+
+---
+
 ## CHALLENGE-002: Circular dependency risk between DatabaseModule and TenantModule
 **Date**: 2026-04-16
 **Challenge**: PrismaService needed TenantContextService. Both DatabaseModule and TenantModule are @Global. Importing TenantModule inside DatabaseModule risked circular dependency.
 **Root Cause**: Re-importing a @Global module creates redundant registration.
 **Resolution**: @Global modules don't need to be re-imported — NestJS resolves them from the global scope automatically. AppModule imports TenantModule before DatabaseModule to guarantee load order.
 **Lesson**: Load order in AppModule's `imports` array matters when one global module depends on another.
+
+
+---
+
+## CHALLENGE-011: Platform-specific OAuth token exchange auth methods differ from the standard
+**Date**: 2026-04-29
+**Challenge**: Implemented a generic `StandardOAuthService` assuming all platforms use standard RFC 6749 POST-body credential delivery (`client_id` + `client_secret` in body). After research, discovered Reddit, Pinterest, and X/Twitter all require `Authorization: Basic base64(clientId:clientSecret)` header and reject body-only credentials with a silent 401.
+**Root Cause**: RFC 6749 allows both body and header auth, and different platforms exercise different options. Training knowledge was used without per-platform doc verification.
+**Resolution**: Added `useBasicAuth: boolean` flag to `OAuthPlatformConfig`. When set, `exchangeCode()` builds a Basic auth header and omits `client_id`/`client_secret` from the request body. Research-verified for Reddit (GitHub wiki), Pinterest (v5 API docs), X/Twitter (developer.twitter.com).
+**Lesson**: For OAuth token exchange, always verify whether the platform uses body auth or header auth — they are not interchangeable.
+
+---
+
+## CHALLENGE-012: X/Twitter OAuth 2.0 requires real PKCE — not a static placeholder
+**Date**: 2026-04-29
+**Challenge**: Initial implementation hardcoded `code_challenge: 'challenge'` and `code_challenge_method: 'plain'` as static extra auth params. This approach does not satisfy X's requirement for PKCE: the verifier must be cryptographically random and the challenge must be its SHA-256 hash (S256 method).
+**Root Cause**: PKCE for server-side OAuth flows requires stateful round-trip (generate verifier before redirect, use it in exchange after callback). No mechanism existed to carry the verifier across the redirect.
+**Resolution**: Added `usesPKCE: boolean` to config. `generateAuthUrl` generates a random 32-byte `code_verifier` (base64url encoded), computes its SHA-256 `code_challenge`, and stores the verifier inside the signed state JWT (using the optional `pkceVerifier` field added to `OAuthStatePayload`). `exchangeCode` reads the verifier from the verified state and sends it in the token exchange body.
+**Lesson**: PKCE verifiers must survive the OAuth redirect round-trip. The signed state JWT is a secure and stateless place to carry them — it requires no Redis/DB storage and cannot be tampered with.
+
+---
+
+## CHALLENGE-013: Mailchimp requires a post-exchange metadata call to get the API server prefix
+**Date**: 2026-04-29
+**Challenge**: After a successful Mailchimp OAuth token exchange, API calls still fail unless you know the account's datacenter prefix (`dc`, e.g. "us1"). The API base URL is `https://us1.api.mailchimp.com/3.0/` — without `dc`, there is no valid URL to call.
+**Root Cause**: Mailchimp's API uses datacenter-specific base URLs. The `dc` value is not in the token response — it requires a separate GET to `https://login.mailchimp.com/oauth2/metadata` with `Authorization: OAuth {access_token}`.
+**Resolution**: Added `requiresMetadataFetch: boolean` to `OAuthPlatformConfig`. After token exchange, `handleCallback` calls `fetchMailchimpMetadata()` which GETs the metadata endpoint and extracts `dc`. The prefix is stored as `externalAccountId` on the `IntegrationConnection` record so the sync worker can retrieve it.
+**Lesson**: Some platforms require additional calls after the token exchange before the integration is usable. Document these in the platform config, not as ad-hoc code.
+
+---
+
+## CHALLENGE-014: Prisma migrate dev shadow DB permission error for enum expansion
+**Date**: 2026-04-29
+**Challenge**: `npx prisma migrate dev` failed with "ERROR: permission denied to create database" when expanding `IntegrationPlatform` enum by 73 new values. The app DB role (`agencypulse`) lacks CREATE DATABASE permission, which Prisma requires for the shadow database.
+**Root Cause**: Shared-schema multi-tenancy design uses a limited-permission app role. Shadow DB creation is a Prisma migrate dev requirement that conflicts with least-privilege DB setup.
+**Resolution**: Wrote a manual SQL migration file using `ALTER TYPE "integration_platform" ADD VALUE IF NOT EXISTS '...'` for each new value (safe to re-run). Applied directly via psql using the migration role. Manually inserted the migration record into `_prisma_migrations`. Ran `prisma generate` after to update the client.
+**Lesson**: When the app DB role is intentionally limited, use manual SQL migrations for DDL that Prisma cannot handle with the shadow DB approach. Always use `IF NOT EXISTS` for idempotency.

@@ -53,13 +53,13 @@ CREATE INDEX idx_dashboard_widgets_dashboard ON dashboard_widgets (tenant_id, da
 ALTER TABLE dashboards ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY tenant_isolation ON dashboards
-  USING (tenant_id = current_setting('app.current_tenant')::uuid);
+  USING (current_setting('app.current_tenant', TRUE) IS NOT NULL AND current_setting('app.current_tenant', TRUE) != '' AND tenant_id = current_setting('app.current_tenant', TRUE)::uuid);
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON dashboards TO agencypulse_app;
 
 ALTER TABLE dashboard_widgets ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY tenant_isolation ON dashboard_widgets
-  USING (tenant_id = current_setting('app.current_tenant')::uuid);
+  USING (current_setting('app.current_tenant', TRUE) IS NOT NULL AND current_setting('app.current_tenant', TRUE) != '' AND tenant_id = current_setting('app.current_tenant', TRUE)::uuid);
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON dashboard_widgets TO agencypulse_app;

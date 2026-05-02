@@ -1,0 +1,28 @@
+{
+  "all": {
+    "daily_metrics": [
+      {
+        "date": "2024-03-01",
+        "data_status": "READY",
+        "metrics": {
+          "IMPRESSION": 34200,
+          "SAVE": 1840,
+          "PIN_CLICK": 2390,
+          "OUTBOUND_CLICK": 1120,
+          "ENGAGEMENT": 4230
+        }
+      },
+      {
+        "date": "2024-03-02",
+        "data_status": "READY",
+        "metrics": {
+          "IMPRESSION": 36800,
+          "SAVE": 1980,
+          "PIN_CLICK": 2540,
+          "OUTBOUND_CLICK": 1204,
+          "ENGAGEMENT": 4520
+        }
+      }
+    ]
+  }
+}

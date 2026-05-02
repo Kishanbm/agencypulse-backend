@@ -1,0 +1,26 @@
+{
+  "success": true,
+  "data": {
+    "metrics": [
+      {
+        "date": "2024-03-01",
+        "company_id": 8421,
+        "impressions": 43800,
+        "clicks": 984,
+        "spend": 541.20,
+        "ctr": 0.0225,
+        "conversions": 38
+      },
+      {
+        "date": "2024-03-02",
+        "company_id": 8421,
+        "impressions": 46200,
+        "clicks": 1042,
+        "spend": 573.10,
+        "ctr": 0.0226,
+        "conversions": 41
+      }
+    ]
+  },
+  "total": 2
+}

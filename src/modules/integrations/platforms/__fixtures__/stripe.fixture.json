@@ -1,0 +1,70 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "ch_3OxABC1234567890",
+      "object": "charge",
+      "amount": 18499,
+      "captured": true,
+      "refunded": false,
+      "amount_captured": 18499,
+      "amount_refunded": 0,
+      "currency": "usd",
+      "status": "succeeded",
+      "created": 1709251200,
+      "paid": true,
+      "description": "Subscription renewal",
+      "customer": "cus_ABC123DEF456",
+      "balance_transaction": {
+        "id": "txn_3OxABC1234567890",
+        "amount": 18499,
+        "net": 17948,
+        "fee": 551
+      }
+    },
+    {
+      "id": "ch_3OxDEF1234567891",
+      "object": "charge",
+      "amount": 9900,
+      "captured": true,
+      "refunded": false,
+      "amount_captured": 9900,
+      "amount_refunded": 0,
+      "currency": "usd",
+      "status": "succeeded",
+      "created": 1709294400,
+      "paid": true,
+      "description": "One-time purchase",
+      "customer": "cus_DEF456GHI789",
+      "balance_transaction": {
+        "id": "txn_3OxDEF1234567891",
+        "amount": 9900,
+        "net": 9612,
+        "fee": 288
+      }
+    },
+    {
+      "id": "ch_3OxGHI1234567892",
+      "object": "charge",
+      "amount": 32500,
+      "captured": true,
+      "refunded": false,
+      "amount_captured": 32500,
+      "amount_refunded": 0,
+      "currency": "usd",
+      "status": "succeeded",
+      "created": 1709337600,
+      "paid": true,
+      "description": "Enterprise plan",
+      "customer": "cus_GHI789JKL012",
+      "balance_transaction": {
+        "id": "txn_3OxGHI1234567892",
+        "amount": 32500,
+        "net": 31556,
+        "fee": 944
+      }
+    }
+  ],
+  "has_more": true,
+  "url": "/v1/charges"
+}

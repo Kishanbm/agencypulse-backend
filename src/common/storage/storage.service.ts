@@ -45,13 +45,19 @@ export class StorageService {
     return key;
   }
 
-  // Returns a pre-signed URL valid for the given number of seconds (default 7 days)
-  async getSignedDownloadUrl(key: string, expiresInSeconds = 604800): Promise<string> {
+  // Returns a pre-signed URL valid for the given number of seconds (max 7 days per S3 spec)
+  async getSignedDownloadUrl(key: string, expiresInSeconds = 3600): Promise<string> {
     return getSignedUrl(
       this.client,
       new GetObjectCommand({ Bucket: this.bucket, Key: key }),
-      { expiresIn: expiresInSeconds },
+      { expiresIn: Math.min(expiresInSeconds, 604800) },
     );
+  }
+
+  // Returns a permanent public URL — use for brand assets (logo, favicon) that have no access control
+  getPublicUrl(key: string): string {
+    const endpoint = this.config.get<string>('storage.endpoint') ?? '';
+    return `${endpoint}/${this.bucket}/${key}`;
   }
 
   async delete(key: string): Promise<void> {

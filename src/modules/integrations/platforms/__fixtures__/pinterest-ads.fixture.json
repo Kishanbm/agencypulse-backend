@@ -1,0 +1,18 @@
+{
+  "data": [
+    {
+      "DATE": "2024-03-01",
+      "SPEND_IN_DOLLAR": 184.52,
+      "IMPRESSION_1": 48200,
+      "CLICK_1": 1023,
+      "TOTAL_CONVERSIONS": 34
+    },
+    {
+      "DATE": "2024-03-02",
+      "SPEND_IN_DOLLAR": 197.30,
+      "IMPRESSION_1": 51400,
+      "CLICK_1": 1098,
+      "TOTAL_CONVERSIONS": 39
+    }
+  ]
+}

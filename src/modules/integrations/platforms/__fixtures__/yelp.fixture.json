@@ -1,0 +1,29 @@
+{
+  "id": "the-yellow-house-san-francisco",
+  "alias": "the-yellow-house-san-francisco",
+  "name": "The Yellow House",
+  "image_url": "https://s3-media4.fl.yelpcdn.com/bphoto/example.jpg",
+  "is_claimed": true,
+  "is_closed": false,
+  "url": "https://www.yelp.com/biz/the-yellow-house-san-francisco",
+  "phone": "+14155551234",
+  "rating": 4.5,
+  "review_count": 312,
+  "categories": [
+    {
+      "alias": "newamerican",
+      "title": "American (New)"
+    }
+  ],
+  "location": {
+    "address1": "123 Market St",
+    "city": "San Francisco",
+    "state": "CA",
+    "zip_code": "94102",
+    "country": "US"
+  },
+  "coordinates": {
+    "latitude": 37.7749,
+    "longitude": -122.4194
+  }
+}

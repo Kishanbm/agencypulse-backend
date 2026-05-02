@@ -1,0 +1,31 @@
+{
+  "reviews": [
+    {
+      "reviewId": "gbp-rev-001",
+      "reviewer": {
+        "profilePhotoUrl": "https://lh3.googleusercontent.com/photo1",
+        "displayName": "Anna S."
+      },
+      "starRating": "FIVE",
+      "comment": "Incredible place, will definitely return.",
+      "createTime": "2024-03-03T10:15:00Z",
+      "updateTime": "2024-03-03T10:15:00Z",
+      "name": "accounts/12345/locations/67890/reviews/gbp-rev-001"
+    },
+    {
+      "reviewId": "gbp-rev-002",
+      "reviewer": {
+        "profilePhotoUrl": "https://lh3.googleusercontent.com/photo2",
+        "displayName": "Chris P."
+      },
+      "starRating": "FOUR",
+      "comment": "Good value for money.",
+      "createTime": "2024-03-08T14:30:00Z",
+      "updateTime": "2024-03-08T14:30:00Z",
+      "name": "accounts/12345/locations/67890/reviews/gbp-rev-002"
+    }
+  ],
+  "averageRating": 4.6,
+  "totalReviewCount": 248,
+  "nextPageToken": null
+}

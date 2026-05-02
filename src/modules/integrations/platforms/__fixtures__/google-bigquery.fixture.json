@@ -1,0 +1,59 @@
+{
+  "kind": "bigquery#queryResponse",
+  "schema": {
+    "fields": [
+      {
+        "name": "date",
+        "type": "DATE",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "metric_key",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "value",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "f": [
+        { "v": "2024-03-01" },
+        { "v": "sessions" },
+        { "v": "4821" }
+      ]
+    },
+    {
+      "f": [
+        { "v": "2024-03-01" },
+        { "v": "conversions" },
+        { "v": "143" }
+      ]
+    },
+    {
+      "f": [
+        { "v": "2024-03-02" },
+        { "v": "sessions" },
+        { "v": "5104" }
+      ]
+    },
+    {
+      "f": [
+        { "v": "2024-03-02" },
+        { "v": "conversions" },
+        { "v": "158" }
+      ]
+    }
+  ],
+  "totalRows": "4",
+  "jobComplete": true,
+  "jobReference": {
+    "projectId": "my-gcp-project",
+    "jobId": "bq-job-abc123xyz456",
+    "location": "US"
+  }
+}

@@ -62,12 +62,16 @@ export class TenantMiddleware implements NestMiddleware {
   }
 
   private extractFromJwt(req: Request): string | undefined {
+    // Try Authorization header first, fall back to ?token query param (needed for SSE/EventSource)
     const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) return undefined;
+    const rawToken = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : (req.query?.token as string | undefined);
 
-    const token = authHeader.slice(7);
+    if (!rawToken) return undefined;
+
     try {
-      const payload = this.jwtService.verify<JwtPayloadMinimal>(token, {
+      const payload = this.jwtService.verify<JwtPayloadMinimal>(rawToken, {
         secret: this.config.get<string>('jwt.accessSecret'),
       });
       return payload?.tenantId;

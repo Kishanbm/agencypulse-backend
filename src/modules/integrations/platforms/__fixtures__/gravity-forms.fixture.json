@@ -1,0 +1,46 @@
+{
+  "entries": [
+    {
+      "id": "gf-entry-4001",
+      "form_id": "1",
+      "date_created": "2024-03-01 09:12:34",
+      "date_updated": "2024-03-01 09:12:34",
+      "is_starred": "0",
+      "is_read": "0",
+      "status": "active",
+      "1": "John",
+      "2": "Doe",
+      "3": "john.doe@example.com",
+      "4": "I'd like more information about your services."
+    },
+    {
+      "id": "gf-entry-4002",
+      "form_id": "1",
+      "date_created": "2024-03-01 14:30:21",
+      "date_updated": "2024-03-01 14:30:21",
+      "is_starred": "0",
+      "is_read": "0",
+      "status": "active",
+      "1": "Jane",
+      "2": "Smith",
+      "3": "jane.smith@example.com",
+      "4": "Please contact me for a demo."
+    },
+    {
+      "id": "gf-entry-4003",
+      "form_id": "1",
+      "date_created": "2024-03-02 10:45:09",
+      "date_updated": "2024-03-02 10:45:09",
+      "is_starred": "0",
+      "is_read": "0",
+      "status": "active",
+      "1": "Bob",
+      "2": "Johnson",
+      "3": "bob.johnson@example.com",
+      "4": "Interested in enterprise pricing."
+    }
+  ],
+  "total_count": 3,
+  "page_size": 100,
+  "current_page": 1
+}

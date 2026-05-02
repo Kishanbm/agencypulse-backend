@@ -62,7 +62,7 @@ export class BrandingService {
     const ext = this.mimeToExt(file.mimetype);
     const key = `${tenantId}/branding/logo.${ext}`;
     await this.storageService.upload(key, file.buffer, file.mimetype);
-    const logoUrl = await this.storageService.getSignedDownloadUrl(key, 365 * 24 * 3600);
+    const logoUrl = this.storageService.getPublicUrl(key);
 
     await this.prisma.agency.update({
       where: { id: tenantId },
@@ -81,7 +81,7 @@ export class BrandingService {
     const ext = this.mimeToExt(file.mimetype);
     const key = `${tenantId}/branding/favicon.${ext}`;
     await this.storageService.upload(key, file.buffer, file.mimetype);
-    const faviconUrl = await this.storageService.getSignedDownloadUrl(key, 365 * 24 * 3600);
+    const faviconUrl = this.storageService.getPublicUrl(key);
 
     await (this.prisma.agency.update as any)({
       where: { id: tenantId },

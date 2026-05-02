@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "date": "2024-03-01",
+      "campaign_group_id": "basis-cg-77001",
+      "impressions": 92400,
+      "clicks": 2108,
+      "spend": 1234.50,
+      "ctr": 0.0228,
+      "conversions": 89
+    },
+    {
+      "date": "2024-03-02",
+      "campaign_group_id": "basis-cg-77001",
+      "impressions": 97100,
+      "clicks": 2240,
+      "spend": 1302.80,
+      "ctr": 0.0231,
+      "conversions": 96
+    }
+  ],
+  "meta": {
+    "total": 2,
+    "campaign_group_id": "basis-cg-77001"
+  }
+}

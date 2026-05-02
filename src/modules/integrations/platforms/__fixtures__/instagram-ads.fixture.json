@@ -1,0 +1,45 @@
+{
+  "data": [
+    {
+      "impressions": 61420,
+      "clicks": 2184,
+      "spend": "384.50",
+      "actions": [
+        {
+          "action_type": "offsite_conversion.fb_pixel_purchase",
+          "value": "47"
+        },
+        {
+          "action_type": "post_engagement",
+          "value": "3210"
+        }
+      ],
+      "date_start": "2024-03-01",
+      "date_stop": "2024-03-01"
+    },
+    {
+      "impressions": 64800,
+      "clicks": 2310,
+      "spend": "403.20",
+      "actions": [
+        {
+          "action_type": "offsite_conversion.fb_pixel_purchase",
+          "value": "52"
+        },
+        {
+          "action_type": "post_engagement",
+          "value": "3490"
+        }
+      ],
+      "date_start": "2024-03-02",
+      "date_stop": "2024-03-02"
+    }
+  ],
+  "paging": {
+    "cursors": {
+      "before": "cursor_before_token",
+      "after": "cursor_after_token"
+    },
+    "next": null
+  }
+}

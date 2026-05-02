@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsUUID } from 'class-validator';
+import { IsEnum, IsOptional, IsUUID, IsString, IsNotEmpty } from 'class-validator';
 import { IntegrationPlatform } from '@prisma/client';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -27,4 +27,18 @@ export class ManualTriggerDto {
   @IsOptional()
   @IsEnum(IntegrationPlatform)
   platform?: IntegrationPlatform;
+}
+
+/** Body for POST /sync/test-connection — test a platform credential without writing to the DB */
+export class TestConnectionDto {
+  @IsEnum(IntegrationPlatform)
+  platform: IntegrationPlatform;
+
+  @IsString()
+  @IsNotEmpty()
+  accessToken: string;
+
+  @IsString()
+  @IsNotEmpty()
+  externalAccountId: string;
 }

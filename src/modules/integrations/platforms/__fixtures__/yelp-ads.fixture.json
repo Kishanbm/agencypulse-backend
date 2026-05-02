@@ -1,0 +1,25 @@
+{
+  "data": [
+    {
+      "date": "2024-03-01",
+      "business_id": "the-yellow-house-san-francisco",
+      "impressions": 12840,
+      "clicks": 348,
+      "spend": 214.20,
+      "ctr": 0.0271,
+      "cpc": 0.615
+    },
+    {
+      "date": "2024-03-02",
+      "business_id": "the-yellow-house-san-francisco",
+      "impressions": 13200,
+      "clicks": 362,
+      "spend": 221.80,
+      "ctr": 0.0274,
+      "cpc": 0.613
+    }
+  ],
+  "meta": {
+    "total": 2
+  }
+}

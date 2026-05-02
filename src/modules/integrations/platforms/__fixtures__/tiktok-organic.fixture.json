@@ -1,0 +1,28 @@
+{
+  "data": {
+    "videos": [
+      {
+        "id": "7123456789012345678",
+        "create_time": 1709251200,
+        "view_count": 84200,
+        "like_count": 6340,
+        "comment_count": 428,
+        "share_count": 1820
+      },
+      {
+        "id": "7123456789012345679",
+        "create_time": 1709337600,
+        "view_count": 102400,
+        "like_count": 8910,
+        "comment_count": 571,
+        "share_count": 2340
+      }
+    ],
+    "cursor": 2,
+    "has_more": false
+  },
+  "error": {
+    "code": "ok",
+    "message": ""
+  }
+}

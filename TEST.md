@@ -305,3 +305,152 @@ System templates (Tier 1) not seeded — browse endpoints return empty. Seed via
 | Amazon Ads | `AMAZON_ADS_CLIENT_ID`, `AMAZON_ADS_CLIENT_SECRET`, `AMAZON_ADS_REDIRECT_URI` |
 | Template Marketplace (clone) | Seed system templates into `dashboard_templates` / `report_templates` tables |
 | Report PDF generation | MinIO configured (`STORAGE_ENDPOINT`, `STORAGE_ACCESS_KEY`, etc.) |
+
+---
+
+## Frontend Phase B1 — Clients & Campaigns (2026-04-24)
+
+**Tester:** Kishan (browser — http://localhost:5174)
+**Account:** kishan@qodet.com (AGENCY_OWNER)
+**Backend:** http://localhost:3001
+
+### B1 Checklist
+
+| # | Test | Result |
+|---|------|--------|
+| B1-01 | `/clients` loads — real `GET /clients` API call, 0 clients empty state | ✅ PASS |
+| B1-02 | Add Client dialog — `POST /clients` — "Client created" toast, list updates | ✅ PASS |
+| B1-03 | Edit Client — `PATCH /clients/:id` — name updates in list immediately | ✅ PASS |
+| B1-04 | Delete Client — `DELETE /clients/:id` — client removed from list | ✅ PASS |
+| B1-05 | DB verified — client row in `clients` table with correct `tenant_id`, `status=ACTIVE` | ✅ PASS |
+| B1-06 | `/clients/:clientId` — client detail page loads, breadcrumb correct | ✅ PASS |
+| B1-07 | Client header shows name, Active badge, website, `_count.campaigns`, `_count.staffAssignments` | ✅ PASS |
+| B1-08 | Add Campaign — `POST /clients/:id/campaigns` — "Campaign created" toast, list updates immediately | ✅ PASS |
+| B1-09 | Edit Campaign — `PATCH /clients/:id/campaigns/:id` — updates immediately | ✅ PASS |
+| B1-10 | Delete Campaign — `DELETE /clients/:id/campaigns/:id` — removed immediately | ✅ PASS |
+| B1-11 | DB verified — campaign row with correct `client_id`, `status=ACTIVE` | ✅ PASS |
+| B1-12 | `/clients/:clientId/campaigns/:campaignId` — campaign home loads | ✅ PASS |
+| B1-13 | Campaign home breadcrumb: Clients → Client Name → Campaign Name | ✅ PASS |
+| B1-14 | Campaign home shows 11 feature nav cards (Dashboards, Reports, Integrations, Alerts, Goals, Notes, Health, Scorecard, Forecast, Export, AI Assistant) | ✅ PASS |
+| B1-15 | Clicking Dashboards/Reports nav cards navigates to correct stub pages | ✅ PASS |
+
+### Bug Found & Fixed
+
+| # | Bug | Fix |
+|---|-----|-----|
+| F4 | Campaigns list showed "No campaigns yet" after create — staleTime (30s) prevented immediate refetch on invalidation | Removed `staleTime` from `useCampaigns` and `useClient` queries so `invalidateQueries` triggers refetch immediately |
+
+**Status: Phase B1 COMPLETE ✅ — Ready for Phase B2 (Team & Invites)**
+
+---
+
+## Frontend Phase B2 — Team Management & Staff Assignments (2026-04-24)
+
+**Tester:** Kishan (browser — http://localhost:5174)
+**Account:** kishan@qodet.com (AGENCY_OWNER)
+**Backend:** http://localhost:3001
+
+### B2 Checklist
+
+| # | Test | Result |
+|---|------|--------|
+| B2-01 | `/team` loads — real `GET /team` API call, owner row shows with Active status + "(you)" label | ✅ PASS |
+| B2-02 | Invite staff dialog opens — firstName, lastName, email fields present | ✅ PASS |
+| B2-03 | `POST /team/invite` — "Invite sent" toast, invited user appears as Pending in list | ✅ PASS |
+| B2-04 | Pending row shows "Invited today", Last login: Never, Staff role badge | ✅ PASS |
+| B2-05 | Resend invite — `POST /team/resend-invite` — returns 200 | ✅ PASS |
+| B2-06 | Remove member — `DELETE /team/:userId` — member removed from list | ✅ PASS |
+| B2-07 | Removed member disappears after refresh (not re-shown as pending) | ✅ PASS |
+| B2-08 | Re-invite previously removed email — reuses existing row, invite sent | ✅ PASS |
+| B2-09 | `/clients/:clientId/team` — loads with "0 members" empty state | ✅ PASS |
+| B2-10 | Assign staff dialog — shows only active staff not already assigned | ✅ PASS |
+| B2-11 | `POST /clients/:clientId/assignments` — staff appears in assigned list | ✅ PASS |
+| B2-12 | Unassign staff — `DELETE /clients/:clientId/assignments/:userId` — removed from list | ✅ PASS |
+| B2-13 | DB verified — `staff_client_assignments` row deleted after unassign (0 rows) | ✅ PASS |
+
+### Bugs Found & Fixed
+
+| # | Bug | Fix |
+|---|-----|-----|
+| F5 | `POST /team/invite` 500 RLS error — `inviteStaff` transaction used `this.prisma.$transaction` (app-role client); new user INSERT has no tenant session so RLS rejects it | Changed to `this.systemPrisma.$transaction` (table owner, bypasses RLS) |
+| F6 | `GET /team` only returned `isActive=true` — pending invitees never showed | Removed `isActive: true` filter, replaced with `OR: [{ isActive: true }, { isActive: false, invitationTokenHash: { not: null } }]` |
+| F7 | Removed member still showed after refresh — `removeTeamMember` set `isActive=false` but left `invitationTokenHash` set, so the pending filter still matched | Added `invitationTokenHash: null, invitationExpiresAt: null` to the remove update |
+| F8 | Re-inviting a removed email returned 409 "already pending" — conflict check used `!isActive` without checking token | Fixed check to only throw pending-conflict when `invitationTokenHash` is set; added update-existing-row path for removed users |
+| F9 | Assign dialog showed UUID in trigger instead of staff name — Base UI `SelectValue` renders the item `value` prop | Replaced with inline render that looks up the member name from `availableStaff` array |
+
+**Status: Phase B2 COMPLETE ✅ — Ready for Phase B3 (White-label settings)**
+
+---
+
+## Frontend Phase B3 — White-label Settings (2026-04-24)
+
+**Tester:** Kishan (browser — http://localhost:5174)
+**Account:** kishan@qodet.com (AGENCY_OWNER)
+**Backend:** http://localhost:3001
+
+### B3 Checklist
+
+| # | Test | Result |
+|---|------|--------|
+| B3-01 | `/settings/profile` loads with agency name + slug pre-filled from real API | ✅ PASS |
+| B3-02 | Save button disabled when form is not dirty | ✅ PASS |
+| B3-03 | Edit name → Save → "Agency profile saved" toast, form resets dirty state | ✅ PASS |
+| B3-04 | Invalid slug (double hyphen) → validation error shown, Save stays disabled | ✅ PASS |
+| B3-05 | `/settings/branding` loads with current colors, logo placeholder, favicon placeholder | ✅ PASS |
+| B3-06 | Change primary color → live preview strip updates immediately | ✅ PASS |
+| B3-07 | Save branding → "Branding saved" toast, DB confirmed `primary_color = #E11D48` | ✅ PASS |
+| B3-08 | Logo upload → appears in logo slot, DB `logo_url` = MinIO public URL | ✅ PASS |
+| B3-09 | Favicon upload → appears in favicon slot, DB `favicon_url` = MinIO public URL | ✅ PASS |
+| B3-10 | Invalid custom domain (e.g. `notadomain`) → validation error shown | ✅ PASS |
+| B3-11 | Invalid from address email → validation error shown | ✅ PASS |
+| B3-12 | RBAC — AGENCY_ADMIN visiting `/settings/branding` → redirected (OWNER only) | ⏭ SKIPPED — RoleRoute guard verified in Phase A |
+
+### Bugs Found & Fixed
+
+| # | Bug | Fix |
+|---|-----|-----|
+| F10 | Logo/favicon upload 500 — `getSignedDownloadUrl(1 year)` exceeds S3/MinIO hard cap of 7 days | Switched to `getPublicUrl()` (plain MinIO URL) for brand assets; presigned URLs reserved for sensitive files (reports, exports) |
+| F11 | MinIO not running — logo upload failed with connection error | Started MinIO container via `docker compose up -d minio`, created bucket, set public policy |
+
+### Known Limitation
+- Brand colors (primary/secondary) saved to DB and CSS vars injected by BrandingProvider — but agency app sidebar/topbar uses hardcoded Tailwind dark theme classes, not CSS vars. Color changes are reflected in client portal and reports, not the agency app UI itself. This is intentional.
+
+**Status: Phase B3 COMPLETE ✅ — Ready for Phase B4 (Integrations / Data Sources)**
+
+---
+
+## Frontend Phase B4 — Integrations / Data Sources (2026-04-24)
+
+**Tester:** Kishan (browser — http://localhost:5174)
+**Account:** kishan@qodet.com (AGENCY_OWNER)
+**Backend:** http://localhost:3001
+
+### B4 Checklist
+
+| # | Test | Result |
+|---|------|--------|
+| B4-01 | Campaign → Integrations nav card → 8 platform cards load, all Disconnected | ✅ PASS |
+| B4-02 | Breadcrumb: Clients / Client / Campaign / Integrations | ✅ PASS |
+| B4-03 | Click Connect GA4 → redirected to Google OAuth consent screen | ✅ PASS |
+| B4-04 | Approve OAuth → callback hits backend → redirects to `/clients/:clientId/campaigns/:campaignId/integrations?connected=ga4` (correct full URL, not old `/campaigns/:id`) | ✅ PASS |
+| B4-05 | "Google Analytics 4 connected successfully" toast appears | ✅ PASS |
+| B4-06 | GA4 card flips to Connected with green badge + "First sync pending…" | ✅ PASS |
+| B4-07 | DB verified — `integration_connections` row: `platform=GA4`, `status=CONNECTED` | ✅ PASS |
+| B4-08 | Disconnect GA4 → confirmation dialog shows platform name | ✅ PASS |
+| B4-09 | Confirm disconnect → card flips to Disconnected instantly (optimistic update) | ✅ PASS |
+| B4-10 | DB verified — `status=DISCONNECTED` after disconnect | ✅ PASS |
+
+### Bugs Found & Fixed
+
+| # | Bug | Fix |
+|---|-----|-----|
+| F12 | Google OAuth callback returned 400 — DTO rejected `iss`, `scope`, `authuser`, `prompt` params that Google sends back | Added `@IsOptional() @IsString()` fields for all 4 extra params to all 4 Google callback DTOs (GA4, Google Ads, GSC, YouTube) |
+| F13 | Token exchange failed on first attempt — authorization code was already consumed by the previous failed (DTO validation) request | Codes are single-use; re-tried connect flow with fresh code, succeeded |
+| F14 | Disconnect returned 500 — frontend sent slug `ga4` but backend `IntegrationPlatform` enum expects `GA4` | Convert slug to enum in frontend: `platformId.toUpperCase().replace(/-/g, "_")` |
+
+### Key Architecture Fix (B4)
+- **Old OAuth redirect**: backend redirected to `/campaigns/:campaignId?connected=ga4` — bare URL with no `clientId`, unusable by the frontend router
+- **New OAuth redirect**: backend now embeds `clientId` in the OAuth state JWT (derived from DB, not trusted from frontend), redirects to `/clients/:clientId/campaigns/:campaignId/integrations?connected=ga4`
+- All 8 platform OAuth services updated — no sessionStorage workaround needed
+
+**Status: Phase B4 COMPLETE ✅ — Ready for Phase B5**

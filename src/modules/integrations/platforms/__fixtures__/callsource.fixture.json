@@ -1,0 +1,37 @@
+{
+  "calls": [
+    {
+      "call_id": "CS-00112233",
+      "account_id": "CS-ACCT-9901",
+      "call_date": "2024-03-01",
+      "call_type": "sales",
+      "duration_sec": 291,
+      "answered": true,
+      "caller_number": "+15551234567",
+      "tracking_number": "+15559876543"
+    },
+    {
+      "call_id": "CS-00112234",
+      "account_id": "CS-ACCT-9901",
+      "call_date": "2024-03-01",
+      "call_type": "service",
+      "duration_sec": 178,
+      "answered": true,
+      "caller_number": "+15552345678",
+      "tracking_number": "+15559876543"
+    },
+    {
+      "call_id": "CS-00112235",
+      "account_id": "CS-ACCT-9901",
+      "call_date": "2024-03-02",
+      "call_type": "sales",
+      "duration_sec": 340,
+      "answered": true,
+      "caller_number": "+15553456789",
+      "tracking_number": "+15559876543"
+    }
+  ],
+  "total": 3,
+  "page": 1,
+  "page_size": 100
+}

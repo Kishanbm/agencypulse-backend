@@ -1,0 +1,43 @@
+{
+  "data": [
+    {
+      "uri": "/videos/123456789",
+      "name": "Product Demo Q1 2024",
+      "created_time": "2024-03-05T10:30:00+00:00",
+      "stats": {
+        "plays": 4820,
+        "likes": 312,
+        "comments": 47,
+        "downloads": 18
+      },
+      "duration": 183,
+      "pictures": {
+        "base_link": "https://i.vimeocdn.com/video/123456789_640.jpg"
+      }
+    },
+    {
+      "uri": "/videos/987654321",
+      "name": "Tutorial Series Part 3",
+      "created_time": "2024-03-12T14:00:00+00:00",
+      "stats": {
+        "plays": 7210,
+        "likes": 524,
+        "comments": 93,
+        "downloads": 31
+      },
+      "duration": 412,
+      "pictures": {
+        "base_link": "https://i.vimeocdn.com/video/987654321_640.jpg"
+      }
+    }
+  ],
+  "total": 2,
+  "page": 1,
+  "per_page": 100,
+  "paging": {
+    "next": null,
+    "previous": null,
+    "first": "/me/videos?page=1",
+    "last": "/me/videos?page=1"
+  }
+}

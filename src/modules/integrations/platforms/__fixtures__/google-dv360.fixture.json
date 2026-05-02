@@ -1,0 +1,33 @@
+{
+  "queryId": "dv360-query-9876543",
+  "metadata": {
+    "title": "DV360 Daily Report",
+    "dataRange": {
+      "range": "CUSTOM_DATES",
+      "customStartDate": { "year": 2024, "month": 3, "day": 1 },
+      "customEndDate": { "year": 2024, "month": 3, "day": 31 }
+    },
+    "status": {
+      "state": "DONE",
+      "finishTimeMs": "1711929600000"
+    }
+  },
+  "rows": [
+    {
+      "Date": "20240301",
+      "Advertiser ID": "987654321",
+      "Impressions": 452300,
+      "Clicks": 5840,
+      "TotalMediaCostPartnerCurrency": 3892.10,
+      "TotalConversions": 142
+    },
+    {
+      "Date": "20240302",
+      "Advertiser ID": "987654321",
+      "Impressions": 471600,
+      "Clicks": 6120,
+      "TotalMediaCostPartnerCurrency": 4071.40,
+      "TotalConversions": 158
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "data": {
+    "reviews": [
+      {
+        "id": "synup-rev-3001",
+        "location_uid": "550e8400-e29b-41d4-a716-446655440000",
+        "date": "2024-03-06",
+        "rating": 5,
+        "source": "google",
+        "reviewer_name": "Emily R.",
+        "review_text": "Absolutely love this place!"
+      },
+      {
+        "id": "synup-rev-3002",
+        "location_uid": "550e8400-e29b-41d4-a716-446655440000",
+        "date": "2024-03-11",
+        "rating": 4,
+        "source": "facebook",
+        "reviewer_name": "David H.",
+        "review_text": "Really solid service."
+      }
+    ],
+    "avg_rating": 4.5,
+    "total_reviews": 2
+  }
+}

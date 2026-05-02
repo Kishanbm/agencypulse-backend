@@ -1,0 +1,32 @@
+{
+  "data": {
+    "campaignStats": {
+      "edges": [
+        {
+          "node": {
+            "date": "2024-03-01",
+            "impressions": 74200,
+            "clicks": 1923,
+            "spend": 834.50,
+            "ctr": 0.0259,
+            "conversions": 67
+          }
+        },
+        {
+          "node": {
+            "date": "2024-03-02",
+            "impressions": 78400,
+            "clicks": 2042,
+            "spend": 882.10,
+            "ctr": 0.0260,
+            "conversions": 72
+          }
+        }
+      ],
+      "pageInfo": {
+        "hasNextPage": false,
+        "endCursor": null
+      }
+    }
+  }
+}

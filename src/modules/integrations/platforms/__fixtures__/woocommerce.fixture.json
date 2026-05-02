@@ -1,0 +1,34 @@
+{
+  "totals": {
+    "total_sales": "5842.75",
+    "net_sales": "5292.75",
+    "average_sales": "292.14",
+    "total_orders": 20,
+    "total_items": 48,
+    "total_tax": "550.00",
+    "total_shipping": "180.00",
+    "total_refunds": 0,
+    "total_discount": "120.00",
+    "totals_grouped_by": "day",
+    "totals": {
+      "2024-03-01": {
+        "sales": "2940.30",
+        "orders": 10,
+        "items": 23,
+        "tax": "270.00",
+        "shipping": "90.00",
+        "discount": "60.00",
+        "customers": 8
+      },
+      "2024-03-02": {
+        "sales": "2902.45",
+        "orders": 10,
+        "items": 25,
+        "tax": "280.00",
+        "shipping": "90.00",
+        "discount": "60.00",
+        "customers": 9
+      }
+    }
+  }
+}

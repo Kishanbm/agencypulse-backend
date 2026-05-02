@@ -34,13 +34,14 @@ export class GoogleAdsOAuthService {
 
     const campaign = await this.prisma.campaign.findFirst({
       where: this.buildCampaignWhere(user, campaignId),
-      select: { id: true },
+      select: { id: true, clientId: true },
     });
 
     if (!campaign) throw new NotFoundException('Campaign not found.');
 
     const state = this.googleOAuth.signState({
       campaignId,
+      clientId: campaign.clientId,
       tenantId: user.tenantId,
       userId: user.id,
       platform: IntegrationPlatform.GOOGLE_ADS,
@@ -116,7 +117,7 @@ export class GoogleAdsOAuthService {
     });
 
     const frontendUrl = this.config.get<string>('app.frontendUrl');
-    return `${frontendUrl}/campaigns/${state.campaignId}?connected=google-ads`;
+    return `${frontendUrl}/clients/${state.clientId}/campaigns/${state.campaignId}/integrations?connected=google-ads`;
   }
 
   // ─── List accessible customers for a campaign ─────────────────────────────

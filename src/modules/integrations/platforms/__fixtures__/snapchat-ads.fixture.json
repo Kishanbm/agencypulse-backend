@@ -1,0 +1,30 @@
+{
+  "request_status": "SUCCESS",
+  "request_id": "5f9d3b2a-1234-5678-90ab-cdef01234567",
+  "lifetime_stats": [
+    {
+      "start_time": "2024-03-01T00:00:00-07:00",
+      "end_time": "2024-03-01T23:59:59-07:00",
+      "stats": {
+        "impressions": 87430,
+        "swipes": 2341,
+        "spend": 312450000,
+        "video_views": 54200,
+        "frequency": 2.1
+      },
+      "granularity": "DAY"
+    },
+    {
+      "start_time": "2024-03-02T00:00:00-07:00",
+      "end_time": "2024-03-02T23:59:59-07:00",
+      "stats": {
+        "impressions": 91200,
+        "swipes": 2490,
+        "spend": 328900000,
+        "video_views": 56800,
+        "frequency": 2.2
+      },
+      "granularity": "DAY"
+    }
+  ]
+}

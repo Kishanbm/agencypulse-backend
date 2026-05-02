@@ -93,29 +93,51 @@ export class TemplatesService {
     user: AuthenticatedUser,
     templateId: string,
     dto: CloneTemplateDto,
-  ): Promise<{ dashboardId: string }> {
-    const tpl = await this.getDashboardTemplate(templateId);
-    await this.assertCampaignAccess(user, dto.campaignId);
+  ): Promise<{ id: string; name: string; campaignId: string }> {
+    const campaignId = dto.campaignId?.trim();
+    if (!campaignId) throw new BadRequestException('campaignId is required');
+    await this.assertCampaignAccess(user, campaignId);
+
+    // Tier 1: global dashboardTemplate table
+    const globalTpl = await (this.prisma as any).dashboardTemplate.findFirst({
+      where: { id: templateId, isActive: true },
+    });
+
+    // Tier 2: agency-owned dashboard marked as template
+    const agencyTpl = !globalTpl
+      ? await (this.prisma as any).dashboard.findFirst({
+          where: { id: templateId, tenantId: user.tenantId, isTemplate: true, deletedAt: null },
+          include: { widgets: true },
+        })
+      : null;
+
+    if (!globalTpl && !agencyTpl) throw new NotFoundException('Dashboard template not found.');
+
+    const tpl = globalTpl ?? agencyTpl;
+    const isAgency = !globalTpl;
 
     const dashboardId = await this.prisma.$transaction(async (tx) => {
-      // Create new dashboard
+      if (!campaignId) throw new BadRequestException('campaignId is required');
+      await (tx as any).$executeRawUnsafe(`SET LOCAL app.current_tenant = '${user.tenantId}'`);
       const dashboard = await tx.dashboard.create({
         data: {
           tenantId: user.tenantId,
-          campaignId: dto.campaignId,
-          name: dto.name ?? tpl.name,
+          campaignId,
+          name: dto.name ?? tpl.templateName ?? tpl.name,
         },
-        select: { id: true },
+        select: { id: true, name: true, campaignId: true },
       });
 
-      // Copy widgets
-      const widgets = (tpl.widgets ?? []) as any[];
+      const widgets = isAgency
+        ? (tpl.widgets ?? [])
+        : ((tpl.widgets ?? []) as any[]);
+
       for (const w of widgets) {
         await tx.dashboardWidget.create({
           data: {
             tenantId: user.tenantId,
             dashboardId: dashboard.id,
-            campaignId: dto.campaignId,
+            campaignId,
             widgetType: w.widgetType,
             platform: w.platform ?? null,
             metricKeys: w.metricKeys ?? [],
@@ -125,47 +147,70 @@ export class TemplatesService {
         });
       }
 
-      // Bump clone count
-      await (tx as any).dashboardTemplate.update({
-        where: { id: templateId },
-        data: { cloneCount: { increment: 1 } },
-      });
+      if (!isAgency) {
+        await (tx as any).dashboardTemplate.update({
+          where: { id: templateId },
+          data: { cloneCount: { increment: 1 } },
+        });
+      }
 
-      return dashboard.id;
+      return dashboard;
     });
 
-    return { dashboardId };
+    return { id: dashboardId.id, name: dashboardId.name, campaignId: dashboardId.campaignId };
   }
 
   async cloneReportTemplate(
     user: AuthenticatedUser,
     templateId: string,
     dto: CloneTemplateDto,
-  ): Promise<{ reportId: string }> {
-    const tpl = await this.getReportTemplate(templateId);
-    await this.assertCampaignAccess(user, dto.campaignId);
+  ): Promise<{ id: string; name: string; campaignId: string }> {
+    const campaignId = dto.campaignId?.trim();
+    if (!campaignId) throw new BadRequestException('campaignId is required');
+    await this.assertCampaignAccess(user, campaignId);
+
+    // Tier 1: global reportTemplate table
+    const globalTpl = await (this.prisma as any).reportTemplate.findFirst({
+      where: { id: templateId, isActive: true },
+    });
+
+    // Tier 2: agency-owned report marked as template
+    const agencyTpl = !globalTpl
+      ? await (this.prisma as any).report.findFirst({
+          where: { id: templateId, tenantId: user.tenantId, isTemplate: true, deletedAt: null },
+        })
+      : null;
+
+    if (!globalTpl && !agencyTpl) throw new NotFoundException('Report template not found.');
+
+    const tpl = globalTpl ?? agencyTpl;
+    const isAgency = !globalTpl;
 
     const reportId = await this.prisma.$transaction(async (tx) => {
+      if (!campaignId) throw new BadRequestException('campaignId is required');
+      await (tx as any).$executeRawUnsafe(`SET LOCAL app.current_tenant = '${user.tenantId}'`);
       const report = await tx.report.create({
         data: {
           tenantId: user.tenantId,
-          campaignId: dto.campaignId,
-          name: dto.name ?? tpl.name,
+          campaignId,
+          name: dto.name ?? tpl.templateName ?? tpl.name,
           sections: tpl.sections ?? [],
           createdById: user.id,
         },
-        select: { id: true },
+        select: { id: true, name: true, campaignId: true },
       });
 
-      await (tx as any).reportTemplate.update({
-        where: { id: templateId },
-        data: { cloneCount: { increment: 1 } },
-      });
+      if (!isAgency) {
+        await (tx as any).reportTemplate.update({
+          where: { id: templateId },
+          data: { cloneCount: { increment: 1 } },
+        });
+      }
 
-      return report.id;
+      return report;
     });
 
-    return { reportId };
+    return { id: reportId.id, name: reportId.name, campaignId: reportId.campaignId };
   }
 
   // ─── Save existing as template (Tier 2 — agency private) ───────────────────

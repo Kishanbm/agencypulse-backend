@@ -74,6 +74,6 @@ CREATE UNIQUE INDEX idx_metric_values_upsert
 ALTER TABLE metric_values ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY tenant_isolation ON metric_values
-  USING (tenant_id = current_setting('app.current_tenant')::uuid);
+  USING (current_setting('app.current_tenant', TRUE) IS NOT NULL AND current_setting('app.current_tenant', TRUE) != '' AND tenant_id = current_setting('app.current_tenant', TRUE)::uuid);
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON metric_values TO agencypulse_app;

@@ -42,6 +42,9 @@ import { TemplatesModule } from './modules/templates/templates.module';
 import { AiModule } from './modules/ai/ai.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { AgencyOverviewModule } from './modules/agency-overview/agency-overview.module';
+import { PortalModule } from './modules/portal/portal.module';
+import { PlatformStubModule } from './modules/integrations/platform-stub/platform-stub.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from './modules/auth/guards/roles.guard';
 
@@ -176,6 +179,16 @@ import { RolesGuard } from './modules/auth/guards/roles.guard';
 
     // Phase 8.4 + 8.5 — AI Report Summary + AI Assistant (Campaign Q&A)
     AiModule,
+
+    // Agency Overview — cross-campaign metrics aggregation + campaign ranking
+    AgencyOverviewModule,
+
+    // Portal — client-facing summary endpoint (KPI cards, next report, AI narrative, last sync)
+    PortalModule,
+
+    // Catch-all stub for integrations not yet implemented — must be LAST so
+    // specific platform modules (Ga4Module, MetaAdsModule, etc.) match first.
+    PlatformStubModule,
   ],
 
   providers: [

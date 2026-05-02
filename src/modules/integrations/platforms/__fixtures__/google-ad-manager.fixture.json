@@ -1,0 +1,20 @@
+{
+  "reportJobStatus": "COMPLETED",
+  "reportDownloadURL": "https://storage.googleapis.com/dfp-report-downloads/report-12345678.csv",
+  "rows": [
+    {
+      "Dimension.DATE": "20240301",
+      "Column.TOTAL_LINE_ITEM_LEVEL_IMPRESSIONS": 287400,
+      "Column.TOTAL_LINE_ITEM_LEVEL_CLICKS": 3210,
+      "Column.TOTAL_LINE_ITEM_LEVEL_ALL_REVENUE": 2480.75,
+      "Column.TOTAL_LINE_ITEM_LEVEL_CTR": 0.011173
+    },
+    {
+      "Dimension.DATE": "20240302",
+      "Column.TOTAL_LINE_ITEM_LEVEL_IMPRESSIONS": 302100,
+      "Column.TOTAL_LINE_ITEM_LEVEL_CLICKS": 3394,
+      "Column.TOTAL_LINE_ITEM_LEVEL_ALL_REVENUE": 2612.40,
+      "Column.TOTAL_LINE_ITEM_LEVEL_CTR": 0.011234
+    }
+  ]
+}

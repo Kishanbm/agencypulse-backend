@@ -1,0 +1,45 @@
+{
+  "campaigns": [
+    {
+      "id": 45,
+      "name": "Spring Newsletter 2024",
+      "subject": "Your Spring Deals Are Here!",
+      "type": "classic",
+      "status": "sent",
+      "scheduledAt": "2024-03-20T10:00:00.000Z",
+      "sentDate": "2024-03-20T10:00:05.000Z",
+      "statistics": {
+        "globalStats": {
+          "delivered": 12450,
+          "uniqueOpens": 3870,
+          "uniqueClicks": 1240,
+          "hardBounces": 88,
+          "softBounces": 54,
+          "unsubscriptions": 47,
+          "spamReports": 3
+        }
+      }
+    },
+    {
+      "id": 46,
+      "name": "April Product Update",
+      "subject": "Exciting New Features Inside",
+      "type": "classic",
+      "status": "sent",
+      "scheduledAt": "2024-04-10T09:00:00.000Z",
+      "sentDate": "2024-04-10T09:00:08.000Z",
+      "statistics": {
+        "globalStats": {
+          "delivered": 13200,
+          "uniqueOpens": 4100,
+          "uniqueClicks": 1580,
+          "hardBounces": 92,
+          "softBounces": 60,
+          "unsubscriptions": 51,
+          "spamReports": 5
+        }
+      }
+    }
+  ],
+  "count": 2
+}

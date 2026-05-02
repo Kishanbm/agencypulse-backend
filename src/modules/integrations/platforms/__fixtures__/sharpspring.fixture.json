@@ -1,0 +1,27 @@
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "result": {
+    "leads": {
+      "lead": [
+        {
+          "id": "ss-lead-11001",
+          "firstName": "John",
+          "lastName": "Doe",
+          "emailAddress": "john.doe@example.com",
+          "createTimestamp": "2024-03-05 09:30:00",
+          "updateTimestamp": "2024-03-05 09:30:00"
+        },
+        {
+          "id": "ss-lead-11002",
+          "firstName": "Jane",
+          "lastName": "Smith",
+          "emailAddress": "jane.smith@example.com",
+          "createTimestamp": "2024-03-07 11:15:00",
+          "updateTimestamp": "2024-03-07 11:15:00"
+        }
+      ],
+      "count": 2
+    }
+  },
+  "error": null
+}

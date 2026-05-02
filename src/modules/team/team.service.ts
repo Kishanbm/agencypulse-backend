@@ -47,7 +47,10 @@ export class TeamService {
       where: {
         tenantId,
         role: { in: [UserRole.AGENCY_OWNER, UserRole.AGENCY_ADMIN, UserRole.AGENCY_STAFF] },
-        isActive: true,
+        OR: [
+          { isActive: true },
+          { isActive: false, invitationTokenHash: { not: null } },
+        ],
       },
       select: {
         id: true,
@@ -82,19 +85,23 @@ export class TeamService {
       where: { email: dto.email.toLowerCase() },
     });
     if (existing) {
-      if (!existing.isActive) {
+      if (existing.isActive) {
+        throw new ConflictException('A user with this email already exists in the system.');
+      }
+      if (existing.invitationTokenHash) {
         throw new ConflictException(
           'This email has already been invited but has not accepted yet. Use POST /team/resend-invite to send a new invitation link.',
         );
       }
-      throw new ConflictException('A user with this email already exists in the system.');
+      // isActive=false, no token = previously removed — allow re-invite below
     }
 
     const { rawToken, tokenHash, expiresAt } = this.generateInviteToken();
 
-    // Atomic: re-validate the staff limit and create the user in one transaction
-    // to prevent a TOCTOU race where two concurrent invites both pass the pre-check.
-    const invited = await this.prisma.$transaction(async (tx) => {
+    // Atomic: re-validate the staff limit and create/reactivate the user in one transaction.
+    // Uses systemPrisma (bypasses RLS) — new/reactivated users have no tenant session so the
+    // app-role client would reject the INSERT/UPDATE even with set_config.
+    const invited = await this.systemPrisma.$transaction(async (tx) => {
       const staffCount = await tx.user.count({
         where: {
           tenantId,
@@ -119,6 +126,24 @@ export class TeamService {
         throw new ForbiddenException(
           `Your ${PLAN_LIMITS[effectivePlan].displayName} plan allows ${maxStaff} staff members. Upgrade to add more.`,
         );
+      }
+
+      if (existing) {
+        // Previously removed user — reuse the row, reset invite fields
+        return tx.user.update({
+          where: { id: existing.id },
+          data: {
+            firstName: dto.firstName,
+            lastName: dto.lastName,
+            tenantId,
+            role: UserRole.AGENCY_STAFF,
+            isActive: false,
+            invitedById: inviter.id,
+            invitationTokenHash: tokenHash,
+            invitationExpiresAt: expiresAt,
+            passwordHash: null,
+          },
+        });
       }
 
       return tx.user.create({
@@ -495,7 +520,7 @@ export class TeamService {
     await Promise.all([
       this.prisma.user.update({
         where: { id: targetUserId },
-        data: { isActive: false },
+        data: { isActive: false, invitationTokenHash: null, invitationExpiresAt: null },
       }),
       this.tokenService.revokeAllUserTokens(targetUserId),
     ]);

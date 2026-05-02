@@ -1,0 +1,42 @@
+{
+  "broadcasts": [
+    {
+      "id": "55123456",
+      "status": "sent",
+      "name": "March Newsletter",
+      "subject": "What's new this March",
+      "send_at": "2024-03-13T10:00:00Z",
+      "subscriber_count": 5420,
+      "open_count": 1734,
+      "unique_open_count": 1734,
+      "click_count": 623,
+      "unique_click_count": 623,
+      "unsubscribe_count": 19,
+      "hard_bounce_count": 42,
+      "soft_bounce_count": 18,
+      "spam_complaint_count": 2
+    },
+    {
+      "id": "55223457",
+      "status": "sent",
+      "name": "April Promo",
+      "subject": "Exclusive April deals",
+      "send_at": "2024-04-07T09:00:00Z",
+      "subscriber_count": 5810,
+      "open_count": 1950,
+      "unique_open_count": 1950,
+      "click_count": 720,
+      "unique_click_count": 720,
+      "unsubscribe_count": 24,
+      "hard_bounce_count": 48,
+      "soft_bounce_count": 22,
+      "spam_complaint_count": 3
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "count": 2,
+    "total_pages": 1,
+    "total_count": 2
+  }
+}

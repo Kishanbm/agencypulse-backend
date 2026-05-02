@@ -1,0 +1,38 @@
+[
+  {
+    "id": 100001,
+    "status_id": 10,
+    "date_created": "Thu, 01 Mar 2024 09:15:00 +0000",
+    "date_modified": "Thu, 01 Mar 2024 09:18:00 +0000",
+    "subtotal_ex_tax": "149.99",
+    "total_inc_tax": "168.74",
+    "total_tax": "18.75",
+    "items_total": 2,
+    "customer_id": 77001,
+    "currency_code": "USD"
+  },
+  {
+    "id": 100002,
+    "status_id": 10,
+    "date_created": "Thu, 01 Mar 2024 14:30:00 +0000",
+    "date_modified": "Thu, 01 Mar 2024 14:33:00 +0000",
+    "subtotal_ex_tax": "289.95",
+    "total_inc_tax": "326.20",
+    "total_tax": "36.25",
+    "items_total": 3,
+    "customer_id": 77002,
+    "currency_code": "USD"
+  },
+  {
+    "id": 100003,
+    "status_id": 10,
+    "date_created": "Fri, 02 Mar 2024 11:00:00 +0000",
+    "date_modified": "Fri, 02 Mar 2024 11:04:00 +0000",
+    "subtotal_ex_tax": "74.99",
+    "total_inc_tax": "84.37",
+    "total_tax": "9.38",
+    "items_total": 1,
+    "customer_id": 77003,
+    "currency_code": "USD"
+  }
+]

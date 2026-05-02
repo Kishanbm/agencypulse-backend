@@ -1,0 +1,25 @@
+{
+  "reviews": [
+    {
+      "id": "gu-rev-201",
+      "location_id": "gu-loc-8801",
+      "date": "2024-03-03",
+      "rating": 5,
+      "source": "google",
+      "reviewer_name": "Alice B.",
+      "comment": "Amazing customer service!"
+    },
+    {
+      "id": "gu-rev-202",
+      "location_id": "gu-loc-8801",
+      "date": "2024-03-07",
+      "rating": 4,
+      "source": "google",
+      "reviewer_name": "Tom C.",
+      "comment": "Good experience overall."
+    }
+  ],
+  "request_sent_count": 45,
+  "total": 2,
+  "average_rating": 4.5
+}

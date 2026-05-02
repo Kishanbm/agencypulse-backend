@@ -1,0 +1,18 @@
+{
+  "nb_visits": 18420,
+  "nb_uniq_visitors": 12840,
+  "nb_pageviews": 54300,
+  "nb_unique_pageviews": 41200,
+  "nb_downloads": 340,
+  "nb_uniq_downloads": 310,
+  "nb_outlinks": 1240,
+  "nb_uniq_outlinks": 980,
+  "nb_searches": 2840,
+  "nb_keywords": 1640,
+  "bounce_count": 7368,
+  "sum_visit_length": 9392220,
+  "max_actions": 42,
+  "bounce_rate": "40%",
+  "nb_actions_per_visit": 2.9,
+  "avg_time_on_site": 510
+}

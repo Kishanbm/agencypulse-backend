@@ -1,0 +1,58 @@
+{
+  "contacts": {
+    "contacts": [
+      {
+        "id": "hl-contact-cc001",
+        "locationId": "abc123xyz",
+        "firstName": "Alice",
+        "lastName": "Brown",
+        "email": "alice.brown@example.com",
+        "phone": "+15551234567",
+        "dateAdded": "2024-03-01T09:00:00.000Z",
+        "tags": ["lead", "webinar"]
+      },
+      {
+        "id": "hl-contact-cc002",
+        "locationId": "abc123xyz",
+        "firstName": "Carlos",
+        "lastName": "Martinez",
+        "email": "carlos.martinez@example.com",
+        "phone": "+15552345678",
+        "dateAdded": "2024-03-02T11:30:00.000Z",
+        "tags": ["lead"]
+      }
+    ],
+    "meta": {
+      "total": 2,
+      "nextPageUrl": null
+    }
+  },
+  "opportunities": {
+    "opportunities": [
+      {
+        "id": "hl-opp-dd001",
+        "name": "Website Redesign",
+        "status": "won",
+        "monetaryValue": 4500,
+        "pipelineId": "pipe-001",
+        "stageId": "stage-won",
+        "contactId": "hl-contact-cc001",
+        "createdAt": "2024-03-05T10:00:00.000Z"
+      },
+      {
+        "id": "hl-opp-dd002",
+        "name": "SEO Campaign",
+        "status": "open",
+        "monetaryValue": 2200,
+        "pipelineId": "pipe-001",
+        "stageId": "stage-proposal",
+        "contactId": "hl-contact-cc002",
+        "createdAt": "2024-03-08T14:00:00.000Z"
+      }
+    ],
+    "meta": {
+      "total": 2,
+      "nextPageUrl": null
+    }
+  }
+}

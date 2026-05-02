@@ -1,0 +1,24 @@
+{
+  "d": {
+    "PageStats": [
+      {
+        "Date": "/Date(1709251200000)/",
+        "DateString": "2024-03-01",
+        "Crawls": 1240,
+        "Impressions": 28400,
+        "Clicks": 3120,
+        "AvgCTR": 10.99,
+        "AvgPosition": 7.4
+      },
+      {
+        "Date": "/Date(1709337600000)/",
+        "DateString": "2024-03-02",
+        "Crawls": 1190,
+        "Impressions": 29100,
+        "Clicks": 3290,
+        "AvgCTR": 11.30,
+        "AvgPosition": 7.1
+      }
+    ]
+  }
+}

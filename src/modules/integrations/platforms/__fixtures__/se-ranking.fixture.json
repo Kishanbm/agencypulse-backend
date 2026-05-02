@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "date": "2024-03-01",
+      "avg_position": 8.4,
+      "keywords_in_top_3": 12,
+      "keywords_in_top_10": 47,
+      "keywords_in_top_30": 134
+    },
+    {
+      "date": "2024-03-02",
+      "avg_position": 8.1,
+      "keywords_in_top_3": 14,
+      "keywords_in_top_10": 51,
+      "keywords_in_top_30": 139
+    }
+  ],
+  "meta": {
+    "project_id": 12345,
+    "date_from": "2024-03-01",
+    "date_to": "2024-03-31",
+    "total": 2
+  }
+}

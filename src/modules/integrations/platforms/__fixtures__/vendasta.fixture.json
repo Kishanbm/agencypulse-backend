@@ -1,0 +1,26 @@
+{
+  "reviews": [
+    {
+      "reviewId": "vend-rev-aa001",
+      "businessId": "AG-XXXXXXXXXX",
+      "date": "2024-03-05",
+      "rating": 5,
+      "sentiment": "positive",
+      "sourceName": "Google",
+      "reviewerName": "Jessica W.",
+      "content": "Best business in town!"
+    },
+    {
+      "reviewId": "vend-rev-aa002",
+      "businessId": "AG-XXXXXXXXXX",
+      "date": "2024-03-10",
+      "rating": 3,
+      "sentiment": "neutral",
+      "sourceName": "Yelp",
+      "reviewerName": "Brian K.",
+      "content": "Okay experience, nothing special."
+    }
+  ],
+  "totalCount": 2,
+  "nextPageToken": null
+}

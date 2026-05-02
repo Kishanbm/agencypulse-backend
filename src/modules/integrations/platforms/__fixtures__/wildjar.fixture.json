@@ -1,0 +1,46 @@
+{
+  "calls": [
+    {
+      "id": "wj-call-aa001bb",
+      "account_sid": "wj-acct-cc002dd",
+      "start_date": "2024-03-01",
+      "start_time": "09:05:18",
+      "answered": true,
+      "duration": 176,
+      "transcribed": true,
+      "caller_number": "+61411234567",
+      "tracking_number": "+61387654321",
+      "source": "google_cpc"
+    },
+    {
+      "id": "wj-call-aa002cc",
+      "account_sid": "wj-acct-cc002dd",
+      "start_date": "2024-03-01",
+      "start_time": "14:22:40",
+      "answered": false,
+      "duration": 0,
+      "transcribed": false,
+      "caller_number": "+61422345678",
+      "tracking_number": "+61387654321",
+      "source": "organic"
+    },
+    {
+      "id": "wj-call-aa003dd",
+      "account_sid": "wj-acct-cc002dd",
+      "start_date": "2024-03-02",
+      "start_time": "11:50:05",
+      "answered": true,
+      "duration": 329,
+      "transcribed": true,
+      "caller_number": "+61433456789",
+      "tracking_number": "+61387654321",
+      "source": "facebook"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 500,
+    "total": 3,
+    "has_more": false
+  }
+}

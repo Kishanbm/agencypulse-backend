@@ -1,0 +1,39 @@
+{
+  "kind": "pagespeedonline#result",
+  "id": "https://example.com/",
+  "loadingExperience": {
+    "overall_category": "FAST"
+  },
+  "lighthouseResult": {
+    "requestedUrl": "https://example.com/",
+    "finalUrl": "https://example.com/",
+    "categories": {
+      "performance": {
+        "id": "performance",
+        "score": 0.87
+      }
+    },
+    "audits": {
+      "cumulative-layout-shift": {
+        "id": "cumulative-layout-shift",
+        "score": 0.98,
+        "numericValue": 0.042
+      },
+      "largest-contentful-paint": {
+        "id": "largest-contentful-paint",
+        "score": 0.82,
+        "numericValue": 2340
+      },
+      "total-blocking-time": {
+        "id": "total-blocking-time",
+        "score": 0.90,
+        "numericValue": 180
+      },
+      "server-response-time": {
+        "id": "server-response-time",
+        "score": 0.95,
+        "numericValue": 320
+      }
+    }
+  }
+}

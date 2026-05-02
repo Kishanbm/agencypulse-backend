@@ -435,6 +435,7 @@ enum WidgetType {
 }
 
 enum IntegrationPlatform {
+  // ─── Already implemented ──────────────────────────────────────────────────
   GA4
   GOOGLE_ADS
   META_ADS
@@ -448,7 +449,112 @@ enum IntegrationPlatform {
   SEMRUSH
   MICROSOFT_ADS
 
+  // ─── PPC ──────────────────────────────────────────────────────────────────
+  PINTEREST_ADS
+  SNAPCHAT_ADS
+  X_ADS
+  REDDIT_ADS
+  ADROLL
+  GOOGLE_AD_MANAGER
+  GOOGLE_DV360
+  GOOGLE_LOCAL_SERVICES_ADS
+  INSTAGRAM_ADS
+  SPOTIFY_ADS
+  STACKADAPT
+  SIMPLIFI
+  CHOOZLE
+  GROUNDTRUTH
+  BASIS_PLATFORM
+  YELP_ADS
+
+  // ─── SEO ──────────────────────────────────────────────────────────────────
+  AHREFS
+  MOZ
+  SE_RANKING
+  MAJESTIC_SEO
+  BING_WEBMASTER_TOOLS
+  GOOGLE_BUSINESS_PROFILE
+  GOOGLE_LIGHTHOUSE
+  GOOGLE_PAGESPEED
+  RANK_TRACKER
+  BACKLINK_MONITOR
+
+  // ─── Social (organic) ─────────────────────────────────────────────────────
+  FACEBOOK_ORGANIC
+  INSTAGRAM_ORGANIC
+  PINTEREST_ORGANIC
+  VIMEO
+  X_ORGANIC
+  TIKTOK_ORGANIC
+
+  // ─── Email Marketing ──────────────────────────────────────────────────────
+  KLAVIYO
+  ACTIVECAMPAIGN
+  BREVO
+  CONSTANT_CONTACT
+  CAMPAIGN_MONITOR
+  CONVERTKIT
+  DRIP
+
+  // ─── Ecommerce ────────────────────────────────────────────────────────────
+  WOOCOMMERCE
+  BIGCOMMERCE
+  STRIPE_ECOMMERCE
+  KEAP
+
+  // ─── Analytics & CRM ──────────────────────────────────────────────────────
+  HUBSPOT
+  MATOMO
+  SALESFORCE
+  SHARPSPRING
+  GRAVITY_FORMS
+  UNBOUNCE
+  HIGHLEVEL
+  GOOGLE_SHEETS
+
+  // ─── Call Tracking ────────────────────────────────────────────────────────
+  CALLRAIL
+  CALLTRACKING_METRICS
+  TWILIO
+  WHATCONVERTS
+  MARCHEX
+  AVANSER
+  CALLSOURCE
+  DELACON
+  WILDJAR
+
+  // ─── Local & Reputation ───────────────────────────────────────────────────
+  BRIGHTLOCAL
+  TRUSTPILOT
+  YELP
+  BIRDEYE
+  YEXT
+  GATHERUP
+  GRADE_US
+  SYNUP
+  VENDASTA
+
+  // ─── Database / Warehouse ─────────────────────────────────────────────────
+  GOOGLE_BIGQUERY
+  AMAZON_REDSHIFT
+  MYSQL_DB
+  SNOWFLAKE
+
   @@map("integration_platform")
+}
+
+enum IntegrationCategory {
+  PPC
+  SEO
+  SOCIAL
+  EMAIL
+  ECOMMERCE
+  ANALYTICS
+  CALL_TRACKING
+  LOCAL
+  DATABASE
+
+  @@map("integration_category")
 }
 
 enum ConnectionStatus {

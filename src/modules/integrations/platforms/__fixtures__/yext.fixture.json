@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "uuid": "123e4567-e89b-12d3-a456-426614174000",
+    "errors": []
+  },
+  "response": {
+    "reviewsStats": [
+      {
+        "date": "2024-03-01",
+        "reviewCount": 6,
+        "averageRating": 4.7
+      },
+      {
+        "date": "2024-03-02",
+        "reviewCount": 4,
+        "averageRating": 4.5
+      }
+    ],
+    "listingAccuracy": {
+      "syncAccuracy": 94.2
+    }
+  }
+}

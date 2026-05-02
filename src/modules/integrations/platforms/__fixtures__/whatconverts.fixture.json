@@ -1,0 +1,41 @@
+{
+  "leads": [
+    {
+      "lead_id": 88001,
+      "lead_type": "call",
+      "date_created": "2024-03-01T09:10:00",
+      "status": "good",
+      "value": 0,
+      "phone_number": "+15554321098",
+      "duration": 198
+    },
+    {
+      "lead_id": 88002,
+      "lead_type": "form",
+      "date_created": "2024-03-01T11:30:00",
+      "status": "good",
+      "value": 0,
+      "form_name": "Contact Us"
+    },
+    {
+      "lead_id": 88003,
+      "lead_type": "call",
+      "date_created": "2024-03-02T14:20:00",
+      "status": "good",
+      "value": 0,
+      "phone_number": "+15556543210",
+      "duration": 305
+    },
+    {
+      "lead_id": 88004,
+      "lead_type": "chat",
+      "date_created": "2024-03-02T16:05:00",
+      "status": "good",
+      "value": 0
+    }
+  ],
+  "total_leads": 4,
+  "page": 1,
+  "per_page": 250,
+  "total_pages": 1
+}

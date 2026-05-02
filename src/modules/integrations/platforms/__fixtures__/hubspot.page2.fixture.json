@@ -1,0 +1,17 @@
+{
+  "deals": {
+    "results": [
+      {
+        "id": "deal-004",
+        "properties": {
+          "dealname": "Delta Corp Upsell",
+          "dealstage": "closedwon",
+          "amount": "3200",
+          "createdate": "2024-03-18T11:00:00.000Z",
+          "closedate": "2024-03-28T00:00:00.000Z"
+        }
+      }
+    ],
+    "paging": {}
+  }
+}

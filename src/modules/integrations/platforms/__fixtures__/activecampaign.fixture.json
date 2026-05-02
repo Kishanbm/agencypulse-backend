@@ -1,0 +1,33 @@
+{
+  "campaigns": [
+    {
+      "id": "101",
+      "name": "March Product Launch",
+      "type": "single",
+      "status": "1",
+      "sdate": "2024-03-12 10:00:00",
+      "send_amt": "8520",
+      "uniqueopens": "2134",
+      "uniquelinkclicks": "897",
+      "unsubscribes": "34",
+      "bounces": "62",
+      "totalamt": "8520"
+    },
+    {
+      "id": "102",
+      "name": "Q2 Newsletter",
+      "type": "single",
+      "status": "1",
+      "sdate": "2024-04-02 09:00:00",
+      "send_amt": "9100",
+      "uniqueopens": "2450",
+      "uniquelinkclicks": "1023",
+      "unsubscribes": "41",
+      "bounces": "75",
+      "totalamt": "9100"
+    }
+  ],
+  "meta": {
+    "total": "2"
+  }
+}

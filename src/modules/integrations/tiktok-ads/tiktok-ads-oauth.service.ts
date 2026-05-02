@@ -36,13 +36,14 @@ export class TiktokAdsOAuthService {
 
     const campaign = await this.prisma.campaign.findFirst({
       where: this.buildCampaignWhere(user, campaignId),
-      select: { id: true },
+      select: { id: true, clientId: true },
     });
 
     if (!campaign) throw new NotFoundException('Campaign not found.');
 
     const state = this.oauthState.signState({
       campaignId,
+      clientId: campaign.clientId,
       tenantId: user.tenantId,
       userId: user.id,
       platform: IntegrationPlatform.TIKTOK_ADS,
@@ -116,7 +117,7 @@ export class TiktokAdsOAuthService {
     });
 
     const frontendUrl = this.config.get<string>('app.frontendUrl');
-    return `${frontendUrl}/campaigns/${state.campaignId}?connected=tiktok-ads`;
+    return `${frontendUrl}/clients/${state.clientId}/campaigns/${state.campaignId}/integrations?connected=tiktok-ads`;
   }
 
   // ─── Get valid access token ────────────────────────────────────────────────

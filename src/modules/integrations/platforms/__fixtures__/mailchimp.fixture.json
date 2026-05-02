@@ -1,0 +1,61 @@
+{
+  "campaigns": [
+    {
+      "id": "abc123def456",
+      "type": "regular",
+      "status": "sent",
+      "send_time": "2024-03-18T14:30:00+00:00",
+      "settings": {
+        "subject_line": "Your March Updates",
+        "title": "March 2024 Newsletter",
+        "from_name": "Acme Corp",
+        "reply_to": "hello@acmecorp.com"
+      },
+      "report_summary": {
+        "opens": 2980,
+        "unique_opens": 2340,
+        "open_rate": 0.317,
+        "clicks": 890,
+        "subscriber_clicks": 740,
+        "unique_clicks": 740,
+        "click_rate": 0.121,
+        "emails_sent": 7380,
+        "unsubscribed": 28,
+        "bounces": {
+          "hard_bounces": 55,
+          "soft_bounces": 31,
+          "syntax_errors": 2
+        }
+      }
+    },
+    {
+      "id": "xyz789uvw012",
+      "type": "regular",
+      "status": "sent",
+      "send_time": "2024-04-15T13:00:00+00:00",
+      "settings": {
+        "subject_line": "April Exclusive Offers",
+        "title": "April 2024 Campaign",
+        "from_name": "Acme Corp",
+        "reply_to": "hello@acmecorp.com"
+      },
+      "report_summary": {
+        "opens": 3210,
+        "unique_opens": 2570,
+        "open_rate": 0.334,
+        "clicks": 1040,
+        "subscriber_clicks": 870,
+        "unique_clicks": 870,
+        "click_rate": 0.135,
+        "emails_sent": 7690,
+        "unsubscribed": 33,
+        "bounces": {
+          "hard_bounces": 60,
+          "soft_bounces": 38,
+          "syntax_errors": 1
+        }
+      }
+    }
+  ],
+  "total_items": 2
+}

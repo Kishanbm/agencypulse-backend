@@ -21,9 +21,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private readonly systemPrisma: SystemPrismaService,
   ) {
     super({
-      // Extract JWT from Authorization: Bearer <token> header
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      // Reject expired tokens (do not pass to validate())
+      // Accept token from Authorization header OR ?token= query param (needed for SSE/EventSource)
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        (req) => req?.query?.token as string | null ?? null,
+      ]),
       ignoreExpiration: false,
       secretOrKey: config.getOrThrow<string>('jwt.accessSecret'),
     });

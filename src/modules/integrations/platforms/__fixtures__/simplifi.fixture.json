@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "date": "2024-03-01",
+      "impressions": 56300,
+      "clicks": 1241,
+      "spend": 692.40,
+      "ctr": 0.0220,
+      "conversions": 48
+    },
+    {
+      "date": "2024-03-02",
+      "impressions": 59700,
+      "clicks": 1318,
+      "spend": 731.80,
+      "ctr": 0.0221,
+      "conversions": 53
+    }
+  ],
+  "meta": {
+    "organization_id": "simplifi-org-12345",
+    "total": 2
+  }
+}

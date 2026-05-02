@@ -203,3 +203,61 @@ Format: Decision → Why → Trade-offs → Date
 - **Amazon Ads**: Login with Amazon (LWA) OAuth — standard code + form-encoded exchange. Access token: 1 hour, refresh token: long-lived. Report API is async (PENDING→PROCESSING→COMPLETED). Polling done within the BullMQ sync job (max 90s). Report download is gzip-compressed JSON — decompressed with Node.js `zlib.gunzip`. `Amazon-Advertising-API-ClientId` and `Amazon-Advertising-API-Scope` (profileId) headers required on all API calls.
 
 **Why not force a common abstraction**: Meta/LinkedIn/TikTok/Amazon all work differently at the token exchange layer. Forcing them into a single OAuth service would require messy conditionals. The cost of 5 separate OAuth services is lower than the maintenance cost of one abstract service full of platform-specific branches.
+
+---
+
+## DECISION-016: Agency Overview — Raw SQL Aggregation in a Dedicated Module
+**Date**: 2026-04-25
+**Decision**: Agency-wide metric aggregation (cross-campaign SUM + prior-period delta) and campaign ranking live in a dedicated `agency-overview` NestJS module using raw SQL inside `prisma.$transaction()` with `SET LOCAL app.current_tenant`.
+**Why**: Prisma's fluent API cannot express a single cross-campaign SUM query across `metric_values` with the required filters (dimension_key IS NULL, staff scoping via EXISTS subquery, dynamic ORDER + LIMIT). Using `prisma.$queryRawUnsafe()` inside `$transaction` (which sets `SET LOCAL app.current_tenant = '${tenantId}'`) guarantees RLS fires on the raw query without the session-leak risk of the middleware SET pattern.
+**STAFF scoping**: `$4::uuid IS NULL OR EXISTS (SELECT 1 FROM staff_client_assignments WHERE user_id = $4 AND client_id = c.id)` — when `staffUserId` is null (OWNER/ADMIN), the filter is a no-op; when set (STAFF), it restricts to assigned clients.
+**Why `dimension_key IS NULL`**: metric_values stores breakdown rows (e.g. per-device-type sessions) alongside summary rows. Only summary rows (`dimension_key IS NULL`) should be SUMmed to avoid double-counting.
+**Trade-offs**: Raw SQL bypasses Prisma's type safety — any schema change to `metric_values` must be reflected manually in these queries. Mitigated by isolating the raw SQL to two private methods in the service.
+
+---
+
+## DECISION-017: Agency Overview — CampaignId→ClientId Cross-Reference from Ranking Data
+**Date**: 2026-04-25
+**Decision**: The `GET /agencies/health` endpoint returns campaigns without a `clientId` field. Rather than changing the backend response shape, the frontend builds a `campaignId→clientId` map client-side from the ranking endpoint response (which does include `clientId`).
+**Why**: The ranking endpoint (`GET /agencies/me/campaigns/ranking`) is already fetched on the overview page with `limit=50`. It includes `clientId` on every row. Building a `Record<string, string>` map from this data is O(n) and requires no extra API call. Changing the health endpoint would require a migration + test update across two repos for a cosmetic improvement.
+**How**: `OverviewHealth` accepts `rankingData?: CampaignRankingItem[]` as a prop. The health component builds `{ [campaignId]: clientId }` from it. "Fix now" links navigate to `/clients/${clientId}/campaigns/${campaignId}/integrations` for known campaigns, fall back to `/clients` for unknowns.
+**Trade-offs**: If a campaign has health issues but zero metric data (so it never appears in ranking results), the fallback `/clients` link is used instead of a deep link. Acceptable — campaigns with no metric data don't have a meaningful direct link to integrations anyway.
+
+---
+
+## DECISION-018: Agency Insights — Severity-First Architecture
+**Date**: 2026-04-25
+**Decision**: The Insights panel on the Agency Overview page classifies insights into three tiers (CRITICAL/WARNING/INFO) and surfaces them sorted by severity descending, capped at 8 cards.
+**Why**: An overview page that shows a flat unsorted list of "things happening" forces the user to scan everything. Severity sorting guarantees the most action-required items appear first. The 8-card cap prevents the panel from overwhelming the page on large agencies with many campaigns.
+**Severity rules**:
+- CRITICAL (red): integration errors (`errorCount > 0`), expired tokens (`expiredCount > 0`), metric drops > 30%
+- WARNING (amber): metric drops 10–30%, no integrations connected while campaigns exist
+- INFO (green): metric gains > 20%
+**Each insight carries a deep-link action button** so users can navigate directly to the relevant page (integrations, campaign detail, client list) without guessing.
+**Trade-offs**: Thresholds (10%, 30%, 20%) are hardcoded. A future improvement would be per-agency configurable thresholds. Hardcoded is the right starting point — we can make it configurable when users ask for it.
+
+---
+
+## DECISION-019: Overview Page — Component Decomposition at 700 Lines
+**Date**: 2026-04-25
+**Decision**: Decomposed the monolithic `OverviewPage.tsx` (700+ lines) into 8 focused files: `overview.types.ts`, `overview.utils.ts`, and 5 single-responsibility components (`OverviewInsights`, `OverviewKpis`, `OverviewRanking`, `OverviewHealth`, `OverviewClients`) with a thin `OverviewPage` orchestrator.
+**Why**: A 700-line single-file component violates separation of concerns — each section (KPIs, rankings, health, insights, clients) has distinct data dependencies, loading states, and interaction logic. Co-locating them in one file makes each section hard to test and reason about independently. The decomposition was triggered by an external AI review.
+**React Query deduplication benefit**: Because each child component uses the same queryKey pattern (e.g. `['overview', 'ranking', metric, from, to, 50, 'desc']`), TanStack Query deduplicates the fetch — OverviewInsights and OverviewHealth both read ranking data without an extra network request.
+**Trade-offs**: More files to navigate. Mitigated by co-locating everything under `src/pages/overview/` with a `components/` subdirectory — the structure is self-documenting.
+
+---
+
+## DECISION-020: Single generic OAuth service (StandardOAuthService) over 65 individual platform modules
+**Date**: 2026-04-29
+**Decision**: Implement one `StandardOAuthService` + `StandardApiKeyService` in a `platform-stub` catch-all module instead of creating 65 individual NestJS modules (one per new platform).
+**Why**: The auth-connect flow for all OAuth 2.0 platforms is structurally identical — the only differences are endpoint URLs, scopes, credential env-var names, and a handful of platform-specific behaviors (Basic auth, PKCE, per-shop URLs). A config-driven approach captures all of this in a data structure (`OAUTH_PLATFORM_CONFIGS`) with zero per-platform code. Creating 65 modules would produce ~200+ near-identical files with no added value at this stage. The dedicated-module pattern (GA4, MetaAds, etc.) is reserved for platforms that need custom sync/data-fetch logic.
+**Trade-offs**: All unimplemented platforms share one service — platform-specific runtime errors (bad credentials, wrong scope) surface in the same code path. Acceptable because each platform's config entry is clearly labeled and the error message includes the platform name. When a platform gets a sync implementation, a dedicated module is added and NestJS's route priority (specific before catch-all) ensures the stub is bypassed automatically.
+**Implementation**: `PlatformStubModule` is registered LAST in `app.module.ts`. `StandardOAuthService` reads platform config from `OAUTH_PLATFORM_CONFIGS` Map and handles: standard POST auth, Basic auth, PKCE S256, BigCommerce context param, Mailchimp metadata fetch.
+
+---
+
+## DECISION-021: PKCE code_verifier stored in signed state JWT (not Redis)
+**Date**: 2026-04-29
+**Decision**: Store the PKCE `code_verifier` inside the OAuth state JWT payload rather than in Redis keyed by state.
+**Why**: The state JWT is already signed with `JWT_ACCESS_SECRET` and expires in 10 minutes — it provides tamper-proof, stateless transport of arbitrary payload across the OAuth redirect round-trip. Using Redis would require an extra write (on auth-url generation) and read (on callback), plus a TTL management concern. The JWT approach is zero-infrastructure and equally secure.
+**Trade-offs**: Slightly larger JWT payload (verifier adds ~43 bytes). The state JWT is already not a sensitive secret — it flows through the browser as a query parameter. The verifier itself is not sensitive before the code exchange completes; after exchange it is consumed and worthless.

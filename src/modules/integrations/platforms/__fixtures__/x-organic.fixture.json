@@ -1,0 +1,46 @@
+{
+  "data": [
+    {
+      "id": "1763000000000000001",
+      "text": "Excited to share our Q1 results!",
+      "created_at": "2024-03-01T09:00:00.000Z",
+      "public_metrics": {
+        "retweet_count": 48,
+        "reply_count": 23,
+        "like_count": 312,
+        "quote_count": 15,
+        "impression_count": 18400
+      }
+    },
+    {
+      "id": "1763000000000000002",
+      "text": "New blog post: How to boost your marketing ROI",
+      "created_at": "2024-03-01T15:30:00.000Z",
+      "public_metrics": {
+        "retweet_count": 61,
+        "reply_count": 18,
+        "like_count": 427,
+        "quote_count": 22,
+        "impression_count": 22100
+      }
+    },
+    {
+      "id": "1763000000000000003",
+      "text": "Introducing our latest feature update.",
+      "created_at": "2024-03-02T11:00:00.000Z",
+      "public_metrics": {
+        "retweet_count": 72,
+        "reply_count": 31,
+        "like_count": 518,
+        "quote_count": 28,
+        "impression_count": 26700
+      }
+    }
+  ],
+  "meta": {
+    "newest_id": "1763000000000000003",
+    "oldest_id": "1763000000000000001",
+    "result_count": 3,
+    "next_token": "nexttoken_page2_xyz"
+  }
+}

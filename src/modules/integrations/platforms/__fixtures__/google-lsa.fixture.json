@@ -1,0 +1,41 @@
+{
+  "accountReports": [
+    {
+      "name": "accountReports/customerId=12345678",
+      "customerId": "12345678",
+      "aggregatedInfo": {
+        "numLeads": 18,
+        "numBookings": 12
+      },
+      "businessName": "Acme Plumbing Services",
+      "currencyCode": "USD",
+      "phoneLeads": 14,
+      "messagingLeads": 4,
+      "impressions": 3240,
+      "clicks": 186,
+      "totalCost": "54200",
+      "averageFiveStarRating": 4.8,
+      "currentPeriodChargedLeads": 18,
+      "averageCostPerLead": "30110"
+    },
+    {
+      "name": "accountReports/customerId=12345679",
+      "customerId": "12345679",
+      "aggregatedInfo": {
+        "numLeads": 23,
+        "numBookings": 15
+      },
+      "businessName": "Acme HVAC Services",
+      "currencyCode": "USD",
+      "phoneLeads": 19,
+      "messagingLeads": 4,
+      "impressions": 4100,
+      "clicks": 234,
+      "totalCost": "68900",
+      "averageFiveStarRating": 4.7,
+      "currentPeriodChargedLeads": 23,
+      "averageCostPerLead": "29956"
+    }
+  ],
+  "nextPageToken": null
+}

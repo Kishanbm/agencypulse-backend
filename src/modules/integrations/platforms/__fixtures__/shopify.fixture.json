@@ -1,0 +1,40 @@
+{
+  "orders": [
+    {
+      "id": 5001234567890,
+      "created_at": "2024-03-01T09:22:14-05:00",
+      "financial_status": "paid",
+      "total_price": "184.95",
+      "subtotal_price": "164.95",
+      "total_tax": "20.00",
+      "currency": "USD",
+      "customer": {
+        "id": 6001111222
+      }
+    },
+    {
+      "id": 5001234567891,
+      "created_at": "2024-03-01T14:45:33-05:00",
+      "financial_status": "paid",
+      "total_price": "329.00",
+      "subtotal_price": "299.00",
+      "total_tax": "30.00",
+      "currency": "USD",
+      "customer": {
+        "id": 6001111223
+      }
+    },
+    {
+      "id": 5001234567892,
+      "created_at": "2024-03-02T10:10:08-05:00",
+      "financial_status": "paid",
+      "total_price": "98.50",
+      "subtotal_price": "89.50",
+      "total_tax": "9.00",
+      "currency": "USD",
+      "customer": {
+        "id": 6001111224
+      }
+    }
+  ]
+}

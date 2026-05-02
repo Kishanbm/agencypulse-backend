@@ -1,13 +1,12 @@
-import { IsOptional, IsBoolean, IsInt, Min, Max } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { IsOptional, IsIn, IsInt, Min, Max } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class QueryNotificationsDto {
-  @ApiPropertyOptional({ description: 'Filter by read status' })
+  @ApiPropertyOptional({ description: 'Filter by read status', enum: ['true', 'false'] })
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
-  @IsBoolean()
-  isRead?: boolean;
+  @IsIn(['true', 'false'])
+  isRead?: string;
 
   @ApiPropertyOptional({ default: 1 })
   @IsOptional()

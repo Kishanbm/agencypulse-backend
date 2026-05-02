@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "date": "2024-03-01",
+      "impressions": 98400,
+      "clicks": 2142,
+      "spend": 1420.80,
+      "frequency": 3.2,
+      "reach": 30750
+    },
+    {
+      "date": "2024-03-02",
+      "impressions": 102100,
+      "clicks": 2280,
+      "spend": 1490.30,
+      "frequency": 3.3,
+      "reach": 30940
+    }
+  ],
+  "meta": {
+    "total": 2,
+    "adAccountId": "sp-ad-acct-77001"
+  }
+}

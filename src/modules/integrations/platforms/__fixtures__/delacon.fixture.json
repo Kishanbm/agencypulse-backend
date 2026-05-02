@@ -1,0 +1,42 @@
+{
+  "calls": [
+    {
+      "call_id": "del-2024-00501",
+      "client_id": "del-client-8801",
+      "date": "2024-03-01",
+      "time": "08:50:33",
+      "status": "answered",
+      "duration": 254,
+      "caller": "+61411234567",
+      "destination": "+61298765432",
+      "source": "google"
+    },
+    {
+      "call_id": "del-2024-00502",
+      "client_id": "del-client-8801",
+      "date": "2024-03-01",
+      "time": "12:20:14",
+      "status": "missed",
+      "duration": 0,
+      "caller": "+61422345678",
+      "destination": "+61298765432",
+      "source": "organic"
+    },
+    {
+      "call_id": "del-2024-00503",
+      "client_id": "del-client-8801",
+      "date": "2024-03-02",
+      "time": "14:10:55",
+      "status": "answered",
+      "duration": 383,
+      "caller": "+61433456789",
+      "destination": "+61298765432",
+      "source": "direct"
+    }
+  ],
+  "meta": {
+    "total": 3,
+    "page": 1,
+    "per_page": 100
+  }
+}

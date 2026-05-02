@@ -113,4 +113,163 @@ export default () => ({
     // Example: http://localhost:3000/api/v1/integrations/amazon-ads/callback
     redirectUri: process.env.AMAZON_ADS_REDIRECT_URI,
   },
+
+  // ─── Phase 3.8+ — New integration platforms ───────────────────────────────
+  microsoft: {
+    clientId: process.env.MICROSOFT_ADS_CLIENT_ID,
+    clientSecret: process.env.MICROSOFT_ADS_CLIENT_SECRET,
+    redirectUri: process.env.MICROSOFT_ADS_REDIRECT_URI,
+  },
+  pinterest: {
+    appId: process.env.PINTEREST_APP_ID,
+    appSecret: process.env.PINTEREST_APP_SECRET,
+    redirectUri: process.env.PINTEREST_REDIRECT_URI,
+  },
+  snapchat: {
+    clientId: process.env.SNAPCHAT_CLIENT_ID,
+    clientSecret: process.env.SNAPCHAT_CLIENT_SECRET,
+    redirectUri: process.env.SNAPCHAT_REDIRECT_URI,
+  },
+  xads: {
+    apiKey: process.env.X_ADS_API_KEY,
+    apiSecretKey: process.env.X_ADS_API_SECRET_KEY,
+    accessToken: process.env.X_ADS_ACCESS_TOKEN,
+    accessTokenSecret: process.env.X_ADS_ACCESS_TOKEN_SECRET,
+    redirectUri: process.env.X_ADS_REDIRECT_URI,
+  },
+  reddit: {
+    clientId: process.env.REDDIT_ADS_CLIENT_ID,
+    clientSecret: process.env.REDDIT_ADS_CLIENT_SECRET,
+    redirectUri: process.env.REDDIT_ADS_REDIRECT_URI,
+  },
+  shopify: {
+    apiKey: process.env.SHOPIFY_API_KEY,
+    apiSecret: process.env.SHOPIFY_API_SECRET,
+    redirectUri: process.env.SHOPIFY_REDIRECT_URI,
+  },
+  mailchimp: {
+    clientId: process.env.MAILCHIMP_CLIENT_ID,
+    clientSecret: process.env.MAILCHIMP_CLIENT_SECRET,
+    redirectUri: process.env.MAILCHIMP_REDIRECT_URI,
+  },
+  klaviyo: {
+    apiKey: process.env.KLAVIYO_API_KEY,
+  },
+  hubspot: {
+    clientId: process.env.HUBSPOT_CLIENT_ID,
+    clientSecret: process.env.HUBSPOT_CLIENT_SECRET,
+    redirectUri: process.env.HUBSPOT_REDIRECT_URI,
+  },
+  semrush: {
+    apiKey: process.env.SEMRUSH_API_KEY,
+  },
+  callrail: {
+    apiKey: process.env.CALLRAIL_API_KEY,
+  },
+  googleBusinessProfile: {
+    redirectUri: process.env.GOOGLE_BUSINESS_PROFILE_REDIRECT_URI,
+  },
+  activecampaign: {
+    apiUrl: process.env.ACTIVECAMPAIGN_API_URL,
+    apiKey: process.env.ACTIVECAMPAIGN_API_KEY,
+  },
+  brevo: {
+    apiKey: process.env.BREVO_API_KEY,
+  },
+  constantContact: {
+    clientId: process.env.CONSTANT_CONTACT_CLIENT_ID,
+    clientSecret: process.env.CONSTANT_CONTACT_CLIENT_SECRET,
+    redirectUri: process.env.CONSTANT_CONTACT_REDIRECT_URI,
+  },
+  campaignMonitor: {
+    apiKey: process.env.CAMPAIGN_MONITOR_API_KEY,
+  },
+  convertkit: {
+    apiKey: process.env.CONVERTKIT_API_KEY,
+  },
+  drip: {
+    apiKey: process.env.DRIP_API_KEY,
+  },
+  woocommerce: {
+    consumerKey: process.env.WOOCOMMERCE_CONSUMER_KEY,
+    consumerSecret: process.env.WOOCOMMERCE_CONSUMER_SECRET,
+  },
+  bigcommerce: {
+    clientId: process.env.BIGCOMMERCE_CLIENT_ID,
+    clientSecret: process.env.BIGCOMMERCE_CLIENT_SECRET,
+    redirectUri: process.env.BIGCOMMERCE_REDIRECT_URI,
+  },
+  stripeEcommerce: {
+    apiKey: process.env.STRIPE_ECOMMERCE_API_KEY,
+  },
+  keap: {
+    clientId: process.env.KEAP_CLIENT_ID,
+    clientSecret: process.env.KEAP_CLIENT_SECRET,
+    redirectUri: process.env.KEAP_REDIRECT_URI,
+  },
+  salesforce: {
+    clientId: process.env.SALESFORCE_CLIENT_ID,
+    clientSecret: process.env.SALESFORCE_CLIENT_SECRET,
+    redirectUri: process.env.SALESFORCE_REDIRECT_URI,
+  },
+  matomo: {
+    apiUrl: process.env.MATOMO_API_URL,
+    apiToken: process.env.MATOMO_API_TOKEN,
+  },
+  ahrefs: {
+    apiKey: process.env.AHREFS_API_KEY,
+  },
+  moz: {
+    accessId: process.env.MOZ_ACCESS_ID,
+    secretKey: process.env.MOZ_SECRET_KEY,
+  },
+  calltrackingmetrics: {
+    accessKey: process.env.CTM_ACCESS_KEY,
+    secretKey: process.env.CTM_SECRET_KEY,
+  },
+  brightlocal: {
+    apiKey: process.env.BRIGHTLOCAL_API_KEY,
+  },
+  yext: {
+    clientId: process.env.YEXT_CLIENT_ID,
+    clientSecret: process.env.YEXT_CLIENT_SECRET,
+    redirectUri: process.env.YEXT_REDIRECT_URI,
+  },
+  googleBigQuery: {
+    redirectUri: process.env.GOOGLE_BIGQUERY_REDIRECT_URI,
+  },
+  googleAdManager: {
+    redirectUri: process.env.GOOGLE_AD_MANAGER_REDIRECT_URI,
+  },
+  googleDv360: {
+    redirectUri: process.env.GOOGLE_DV360_REDIRECT_URI,
+  },
+  googleLocalServicesAds: {
+    redirectUri: process.env.GOOGLE_LOCAL_SERVICES_ADS_REDIRECT_URI,
+  },
+  bingWebmasterTools: {
+    redirectUri: process.env.BING_WEBMASTER_TOOLS_REDIRECT_URI,
+  },
+  adroll: {
+    clientId: process.env.ADROLL_CLIENT_ID,
+    clientSecret: process.env.ADROLL_CLIENT_SECRET,
+    redirectUri: process.env.ADROLL_REDIRECT_URI,
+  },
+  spotify: {
+    clientId: process.env.SPOTIFY_ADS_CLIENT_ID,
+    clientSecret: process.env.SPOTIFY_ADS_CLIENT_SECRET,
+    redirectUri: process.env.SPOTIFY_ADS_REDIRECT_URI,
+  },
+  vimeo: {
+    clientId: process.env.VIMEO_CLIENT_ID,
+    clientSecret: process.env.VIMEO_CLIENT_SECRET,
+    redirectUri: process.env.VIMEO_REDIRECT_URI,
+  },
+  snowflake: {
+    account: process.env.SNOWFLAKE_ACCOUNT,
+    username: process.env.SNOWFLAKE_USERNAME,
+    password: process.env.SNOWFLAKE_PASSWORD,
+    warehouse: process.env.SNOWFLAKE_WAREHOUSE,
+    database: process.env.SNOWFLAKE_DATABASE,
+  },
 });

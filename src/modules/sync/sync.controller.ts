@@ -12,7 +12,8 @@ import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { PrismaService } from '../../database/prisma.service';
 import { SyncService } from './sync.service';
 import { SyncSchedulerService } from './sync-scheduler.service';
-import { ManualTriggerDto } from './dto/sync-job.dto';
+import { TestConnectionService } from './test-connection.service';
+import { ManualTriggerDto, TestConnectionDto } from './dto/sync-job.dto';
 
 @ApiTags('sync')
 @Controller('sync')
@@ -21,6 +22,7 @@ export class SyncController {
     private readonly syncService: SyncService,
     private readonly scheduler: SyncSchedulerService,
     private readonly prisma: PrismaService,
+    private readonly testConnectionService: TestConnectionService,
   ) {}
 
   /**
@@ -79,5 +81,22 @@ export class SyncController {
   async runScheduler(): Promise<{ ok: boolean }> {
     await this.scheduler.runScheduledSync();
     return { ok: true };
+  }
+
+  /**
+   * POST /sync/test-connection
+   *
+   * Validates a platform credential by calling fetchCoreMetrics for the last 7 days.
+   * Returns a sample of up to 3 rows on success, or an error message on failure.
+   * Nothing is written to the database — read-only probe.
+   * AGENCY_ADMIN only.
+   */
+  @Post('test-connection')
+  @Roles(UserRole.AGENCY_ADMIN)
+  @ApiOperation({ summary: 'Test a platform connection without writing to the database.' })
+  async testConnection(
+    @Body() dto: TestConnectionDto,
+  ): Promise<{ status: 'ok'; rowCount: number; sampleRows: unknown[] } | { status: 'error'; message: string }> {
+    return this.testConnectionService.testConnection(dto.platform, dto.accessToken, dto.externalAccountId);
   }
 }

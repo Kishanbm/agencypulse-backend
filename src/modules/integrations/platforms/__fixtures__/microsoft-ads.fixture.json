@@ -1,0 +1,28 @@
+{
+  "ReportRequestStatus": {
+    "ReportDownloadUrl": "https://reporting.api.bingads.microsoft.com/reports/12345678-xxxx-xxxx-xxxx-abcdef123456/Report.zip",
+    "Status": "Success"
+  },
+  "rows": [
+    {
+      "TimePeriod": "2024-03-01",
+      "CampaignName": "Brand Campaign",
+      "Impressions": 14820,
+      "Clicks": 1243,
+      "Spend": 892.45,
+      "Ctr": "8.39%",
+      "AverageCpc": 0.718,
+      "Conversions": 87
+    },
+    {
+      "TimePeriod": "2024-03-02",
+      "CampaignName": "Brand Campaign",
+      "Impressions": 15340,
+      "Clicks": 1298,
+      "Spend": 921.10,
+      "Ctr": "8.46%",
+      "AverageCpc": 0.709,
+      "Conversions": 91
+    }
+  ]
+}

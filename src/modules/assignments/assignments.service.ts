@@ -130,6 +130,92 @@ export class AssignmentsService {
     return { message: 'Staff member unassigned.' };
   }
 
+  // ─── List portal users ────────────────────────────────────────────────────
+  // Returns active users (via clientUserAssignment) + pending users
+  // (invited but not yet accepted — pendingClientId still set, isActive false).
+
+  async listPortalUsers(user: AuthenticatedUser, clientId: string) {
+    await this.assertClientAccess(user.tenantId, clientId);
+
+    const [active, pending] = await Promise.all([
+      this.prisma.clientUserAssignment.findMany({
+        where: { clientId, tenantId: user.tenantId },
+        select: {
+          id: true,
+          createdAt: true,
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              isActive: true,
+              emailVerifiedAt: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'asc' },
+      }),
+      this.prisma.user.findMany({
+        where: {
+          tenantId: user.tenantId,
+          pendingClientId: clientId,
+          isActive: false,
+          role: UserRole.CLIENT_USER,
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          isActive: true,
+          emailVerifiedAt: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      }),
+    ]);
+
+    const pendingRows = pending.map((u) => ({
+      id: u.id,
+      createdAt: u.createdAt.toISOString(),
+      user: {
+        id: u.id,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        email: u.email,
+        isActive: u.isActive,
+        emailVerifiedAt: u.emailVerifiedAt,
+      },
+    }));
+
+    return [...active, ...pendingRows];
+  }
+
+  // ─── Revoke portal access ─────────────────────────────────────────────────
+  // Removes the client_user_assignment row — user loses portal access immediately.
+
+  async revokePortalUser(
+    user: AuthenticatedUser,
+    clientId: string,
+    targetUserId: string,
+  ) {
+    await this.assertClientAccess(user.tenantId, clientId);
+
+    const assignment = await this.prisma.clientUserAssignment.findFirst({
+      where: { clientId, userId: targetUserId, tenantId: user.tenantId },
+      select: { id: true },
+    });
+
+    if (!assignment) throw new NotFoundException('Portal access record not found.');
+
+    await this.prisma.clientUserAssignment.delete({
+      where: { id: assignment.id },
+    });
+
+    return { message: 'Portal access revoked.' };
+  }
+
   // ─── Private helpers ───────────────────────────────────────────────────────
 
   /**

@@ -1,8 +1,9 @@
-import { IsString, IsUUID, IsOptional, MaxLength } from 'class-validator';
+import { IsString, IsUUID, IsOptional, IsNotEmpty, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CloneTemplateDto {
   @ApiProperty({ description: 'Target campaign to clone the template into' })
+  @IsNotEmpty()
   @IsUUID()
   campaignId: string;
 

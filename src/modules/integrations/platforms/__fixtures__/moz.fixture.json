@@ -1,0 +1,12 @@
+{
+  "results": [
+    {
+      "url": "https://example.com",
+      "domain_authority": 52,
+      "page_authority": 48,
+      "spam_score": 3,
+      "linking_domains": 1840,
+      "ranking_keywords": 9200
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "contacts": {
+    "results": [],
+    "paging": {
+      "total": 142
+    }
+  },
+  "deals": {
+    "results": [
+      {
+        "id": "deal-001",
+        "properties": {
+          "dealname": "Acme Corp Renewal",
+          "dealstage": "closedwon",
+          "amount": "12000",
+          "createdate": "2024-03-05T10:00:00.000Z",
+          "closedate": "2024-03-15T00:00:00.000Z"
+        }
+      },
+      {
+        "id": "deal-002",
+        "properties": {
+          "dealname": "Beta Inc New Contract",
+          "dealstage": "closedwon",
+          "amount": "8500",
+          "createdate": "2024-03-08T14:00:00.000Z",
+          "closedate": "2024-03-20T00:00:00.000Z"
+        }
+      },
+      {
+        "id": "deal-003",
+        "properties": {
+          "dealname": "Gamma Ltd Expansion",
+          "dealstage": "contractsent",
+          "amount": "5000",
+          "createdate": "2024-03-10T09:00:00.000Z",
+          "closedate": null
+        }
+      }
+    ],
+    "paging": {
+      "next": {
+        "link": "https://api.hubapi.com/crm/v3/objects/deals?limit=100&after=cursor_deals_page2"
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "orders": [
+    {
+      "id": 5001234567893,
+      "created_at": "2024-03-02T16:30:45-05:00",
+      "financial_status": "paid",
+      "total_price": "212.00",
+      "subtotal_price": "192.00",
+      "total_tax": "20.00",
+      "currency": "USD",
+      "customer": {
+        "id": 6001111225
+      }
+    },
+    {
+      "id": 5001234567894,
+      "created_at": "2024-03-03T08:55:12-05:00",
+      "financial_status": "paid",
+      "total_price": "445.80",
+      "subtotal_price": "405.80",
+      "total_tax": "40.00",
+      "currency": "USD",
+      "customer": {
+        "id": 6001111226
+      }
+    }
+  ]
+}

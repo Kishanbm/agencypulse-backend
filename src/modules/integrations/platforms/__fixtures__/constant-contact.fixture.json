@@ -1,0 +1,39 @@
+{
+  "bulk_email_campaign_summaries": [
+    {
+      "campaign_id": "c4a22e18-7d3e-4b91-bc44-3f02f8ab1234",
+      "campaign_name": "Spring Sale Announcement",
+      "scheduled_date": "2024-03-20T10:00:00-05:00",
+      "last_sent_date": "2024-03-20T10:05:00-05:00",
+      "unique_counts": {
+        "sends": 10250,
+        "opens": 3182,
+        "clicks": 1071,
+        "forwards": 42,
+        "optouts": 38,
+        "bounces": 91,
+        "spam_count": 4
+      }
+    },
+    {
+      "campaign_id": "d5b33f29-8e4f-5c02-cd55-4g13g9bc2345",
+      "campaign_name": "April Flash Sale",
+      "scheduled_date": "2024-04-12T09:00:00-05:00",
+      "last_sent_date": "2024-04-12T09:03:00-05:00",
+      "unique_counts": {
+        "sends": 10800,
+        "opens": 3450,
+        "clicks": 1230,
+        "forwards": 55,
+        "optouts": 44,
+        "bounces": 97,
+        "spam_count": 6
+      }
+    }
+  ],
+  "_links": {
+    "next": {
+      "href": "/v3/reports/summary_reports/email_campaign_summaries?next=cursor_abc123"
+    }
+  }
+}

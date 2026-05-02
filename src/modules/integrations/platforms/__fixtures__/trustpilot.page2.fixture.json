@@ -1,0 +1,17 @@
+{
+  "reviews": [
+    {
+      "id": "tp-rev-003ghi",
+      "stars": 5,
+      "createdAt": "2024-03-15T11:00:00Z",
+      "updatedAt": "2024-03-15T11:00:00Z",
+      "title": "Outstanding!",
+      "text": "Would highly recommend to anyone.",
+      "consumer": {
+        "displayName": "Paul R.",
+        "numberOfReviews": 12
+      }
+    }
+  ],
+  "links": []
+}

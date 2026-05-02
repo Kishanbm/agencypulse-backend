@@ -48,30 +48,8 @@ async function main(): Promise<void> {
 
   console.log(`✅ Owner created: ${owner.email}`);
 
-  // 3. Metric Definitions
-  const metrics = [
-    { key: 'sessions', label: 'Sessions', cat: 'Traffic', type: 'number' },
-    { key: 'conversions', label: 'Conversions', cat: 'Conversion', type: 'number' },
-    { key: 'spend', label: 'Spend', cat: 'Financial', type: 'currency' },
-    { key: 'revenue', label: 'Revenue', cat: 'Financial', type: 'currency' },
-    { key: 'aov', label: 'Avg. Order Value', cat: 'Financial', type: 'currency' },
-    { key: 'conv_rate', label: 'Conv. Rate', cat: 'Conversion', type: 'percent' },
-  ];
-
-  for (const m of metrics) {
-    await prisma.metricDefinition.upsert({
-      where: { platform_metricKey: { platform: IntegrationPlatform.GA4, metricKey: m.key } },
-      update: {},
-      create: {
-        platform: IntegrationPlatform.GA4,
-        metricKey: m.key,
-        label: m.label,
-        category: m.cat,
-        dataType: m.type,
-      },
-    });
-  }
-  console.log('✅ Metric definitions seeded');
+  // Metric definitions are seeded at app startup via MetricsService.seedMetricDefinitions()
+  // Do not seed them here — metric-seeds.ts is the single source of truth.
 
   // 4. Client
   const client = await prisma.client.create({

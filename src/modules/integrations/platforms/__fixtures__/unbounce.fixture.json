@@ -1,0 +1,22 @@
+{
+  "pages": [
+    {
+      "id": "ub-page-aa001",
+      "name": "Spring Promo Landing Page",
+      "url": "https://yourdomain.com/spring-promo",
+      "created_at": "2024-01-10T09:00:00Z"
+    },
+    {
+      "id": "ub-page-aa002",
+      "name": "Free Trial Signup",
+      "url": "https://yourdomain.com/free-trial",
+      "created_at": "2024-02-01T10:00:00Z"
+    }
+  ],
+  "metadata": {
+    "total": 2,
+    "page_size": 100,
+    "current": 1,
+    "next": null
+  }
+}

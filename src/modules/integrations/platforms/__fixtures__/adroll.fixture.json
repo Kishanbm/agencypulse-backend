@@ -1,0 +1,31 @@
+{
+  "results": [
+    {
+      "date": "2024-03-01",
+      "impressions": 124500,
+      "clicks": 2890,
+      "spend": 1042.30,
+      "ctr": 0.0232,
+      "cpc": 0.361,
+      "conversions": 118,
+      "cost_per_conversion": 8.83
+    },
+    {
+      "date": "2024-03-02",
+      "impressions": 130200,
+      "clicks": 3040,
+      "spend": 1098.70,
+      "ctr": 0.0234,
+      "cpc": 0.361,
+      "conversions": 126,
+      "cost_per_conversion": 8.72
+    }
+  ],
+  "meta": {
+    "status": 200,
+    "date_range": {
+      "start": "2024-03-01",
+      "end": "2024-03-31"
+    }
+  }
+}

@@ -37,13 +37,14 @@ export class MetaAdsOAuthService {
 
     const campaign = await this.prisma.campaign.findFirst({
       where: this.buildCampaignWhere(user, campaignId),
-      select: { id: true },
+      select: { id: true, clientId: true },
     });
 
     if (!campaign) throw new NotFoundException('Campaign not found.');
 
     const state = this.oauthState.signState({
       campaignId,
+      clientId: campaign.clientId,
       tenantId: user.tenantId,
       userId: user.id,
       platform: IntegrationPlatform.META_ADS,
@@ -128,7 +129,7 @@ export class MetaAdsOAuthService {
     });
 
     const frontendUrl = this.config.get<string>('app.frontendUrl');
-    return `${frontendUrl}/campaigns/${state.campaignId}?connected=meta-ads`;
+    return `${frontendUrl}/clients/${state.clientId}/campaigns/${state.campaignId}/integrations?connected=meta-ads`;
   }
 
   // ─── List ad accounts ─────────────────────────────────────────────────────

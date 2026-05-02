@@ -1,0 +1,21 @@
+{
+  "broadcasts": [
+    {
+      "id": 7891,
+      "created_at": "2024-03-11T08:00:00.000Z",
+      "subject": "New features just dropped",
+      "description": "March product update",
+      "public": false
+    },
+    {
+      "id": 7934,
+      "created_at": "2024-04-03T09:30:00.000Z",
+      "subject": "Your April resources",
+      "description": "April content roundup",
+      "public": false
+    }
+  ],
+  "total_broadcasts": 2,
+  "page": 1,
+  "total_pages": 1
+}

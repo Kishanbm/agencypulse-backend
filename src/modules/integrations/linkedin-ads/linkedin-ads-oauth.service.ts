@@ -38,13 +38,14 @@ export class LinkedinAdsOAuthService {
 
     const campaign = await this.prisma.campaign.findFirst({
       where: this.buildCampaignWhere(user, campaignId),
-      select: { id: true },
+      select: { id: true, clientId: true },
     });
 
     if (!campaign) throw new NotFoundException('Campaign not found.');
 
     const state = this.oauthState.signState({
       campaignId,
+      clientId: campaign.clientId,
       tenantId: user.tenantId,
       userId: user.id,
       platform: IntegrationPlatform.LINKEDIN_ADS,
@@ -115,7 +116,7 @@ export class LinkedinAdsOAuthService {
     });
 
     const frontendUrl = this.config.get<string>('app.frontendUrl');
-    return `${frontendUrl}/campaigns/${state.campaignId}?connected=linkedin-ads`;
+    return `${frontendUrl}/clients/${state.clientId}/campaigns/${state.campaignId}/integrations?connected=linkedin-ads`;
   }
 
   // ─── Get valid access token ────────────────────────────────────────────────

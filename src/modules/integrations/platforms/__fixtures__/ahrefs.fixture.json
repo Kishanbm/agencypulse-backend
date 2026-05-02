@@ -1,0 +1,30 @@
+{
+  "metrics": [
+    {
+      "date": "2024-03-01",
+      "org_traffic": 48200,
+      "org_keywords": 12450,
+      "paid_traffic": 3200,
+      "paid_keywords": 890
+    },
+    {
+      "date": "2024-03-02",
+      "org_traffic": 49100,
+      "org_keywords": 12510,
+      "paid_traffic": 3350,
+      "paid_keywords": 905
+    }
+  ],
+  "refdomains_history": [
+    {
+      "date": "2024-03-01",
+      "refdomains": 3870,
+      "dofollow_refdomains": 2940
+    },
+    {
+      "date": "2024-03-02",
+      "refdomains": 3885,
+      "dofollow_refdomains": 2958
+    }
+  ]
+}

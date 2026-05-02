@@ -1,0 +1,68 @@
+{
+  "data": [
+    {
+      "id": "17841412345678901/insights/impressions/day",
+      "name": "impressions",
+      "period": "day",
+      "values": [
+        {
+          "value": 24300,
+          "end_time": "2024-03-02T07:00:00+0000"
+        },
+        {
+          "value": 26100,
+          "end_time": "2024-03-03T07:00:00+0000"
+        }
+      ]
+    },
+    {
+      "id": "17841412345678901/insights/reach/day",
+      "name": "reach",
+      "period": "day",
+      "values": [
+        {
+          "value": 18200,
+          "end_time": "2024-03-02T07:00:00+0000"
+        },
+        {
+          "value": 19400,
+          "end_time": "2024-03-03T07:00:00+0000"
+        }
+      ]
+    },
+    {
+      "id": "17841412345678901/insights/profile_views/day",
+      "name": "profile_views",
+      "period": "day",
+      "values": [
+        {
+          "value": 843,
+          "end_time": "2024-03-02T07:00:00+0000"
+        },
+        {
+          "value": 912,
+          "end_time": "2024-03-03T07:00:00+0000"
+        }
+      ]
+    },
+    {
+      "id": "17841412345678901/insights/follower_count/day",
+      "name": "follower_count",
+      "period": "day",
+      "values": [
+        {
+          "value": 184,
+          "end_time": "2024-03-02T07:00:00+0000"
+        },
+        {
+          "value": 210,
+          "end_time": "2024-03-03T07:00:00+0000"
+        }
+      ]
+    }
+  ],
+  "paging": {
+    "previous": null,
+    "next": null
+  }
+}

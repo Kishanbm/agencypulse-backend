@@ -1,0 +1,13 @@
+{
+  "range": "Sheet1!A:C",
+  "majorDimension": "ROWS",
+  "values": [
+    ["date", "metric_key", "value"],
+    ["2024-03-01", "sessions", "1250"],
+    ["2024-03-01", "conversions", "42"],
+    ["2024-03-02", "sessions", "1340"],
+    ["2024-03-02", "conversions", "48"],
+    ["2024-03-03", "sessions", "1190"],
+    ["2024-03-03", "conversions", "38"]
+  ]
+}

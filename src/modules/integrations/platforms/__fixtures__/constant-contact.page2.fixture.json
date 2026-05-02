@@ -1,0 +1,20 @@
+{
+  "bulk_email_campaign_summaries": [
+    {
+      "campaign_id": "e6c44g30-9f5g-6d13-de66-5h24h0cd3456",
+      "campaign_name": "May Newsletter",
+      "scheduled_date": "2024-05-08T10:00:00-05:00",
+      "last_sent_date": "2024-05-08T10:02:00-05:00",
+      "unique_counts": {
+        "sends": 11200,
+        "opens": 3680,
+        "clicks": 1340,
+        "forwards": 61,
+        "optouts": 49,
+        "bounces": 103,
+        "spam_count": 7
+      }
+    }
+  ],
+  "_links": {}
+}

@@ -1,0 +1,39 @@
+{
+  "Results": [
+    {
+      "CampaignID": "fc0ce7105bae8d9974f7c3f8",
+      "Subject": "March Highlights",
+      "Name": "March 2024 Newsletter",
+      "SentDate": "2024-03-14 11:30:00",
+      "TotalRecipients": 6800,
+      "UniqueOpens": 1802,
+      "UniqueClicks": 720,
+      "Unsubscribed": 22,
+      "Bounced": 49,
+      "SpamComplaints": 0,
+      "WebVersionURL": "https://createsend.com/t/fc0ce7105bae8d9974f7c3f8",
+      "WebVersionTextURL": "https://createsend.com/t/fc0ce7105bae8d9974f7c3f8/text"
+    },
+    {
+      "CampaignID": "ab1de8206cdf9e1085g8d4g9",
+      "Subject": "April Product Spotlight",
+      "Name": "April 2024 Campaign",
+      "SentDate": "2024-04-08 10:00:00",
+      "TotalRecipients": 7100,
+      "UniqueOpens": 1990,
+      "UniqueClicks": 840,
+      "Unsubscribed": 29,
+      "Bounced": 52,
+      "SpamComplaints": 0,
+      "WebVersionURL": "https://createsend.com/t/ab1de8206cdf9e1085g8d4g9",
+      "WebVersionTextURL": "https://createsend.com/t/ab1de8206cdf9e1085g8d4g9/text"
+    }
+  ],
+  "ResultsOrderedBy": "SentDate",
+  "OrderDirection": "DESC",
+  "PageNumber": 1,
+  "PageSize": 50,
+  "RecordsOnThisPage": 2,
+  "TotalNumberOfRecords": 2,
+  "NumberOfPages": 1
+}

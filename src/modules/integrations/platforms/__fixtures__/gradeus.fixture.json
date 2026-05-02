@@ -1,0 +1,28 @@
+{
+  "reviews": [
+    {
+      "id": "grade-rev-501",
+      "location_id": "grade-loc-1001",
+      "date": "2024-03-04",
+      "rating": 5,
+      "sentiment": "positive",
+      "source": "google",
+      "reviewer": "Mike T."
+    },
+    {
+      "id": "grade-rev-502",
+      "location_id": "grade-loc-1001",
+      "date": "2024-03-09",
+      "rating": 2,
+      "sentiment": "negative",
+      "source": "yelp",
+      "reviewer": "Karen L."
+    }
+  ],
+  "meta": {
+    "total": 2,
+    "avg_rating": 3.5,
+    "positive_count": 1,
+    "negative_count": 1
+  }
+}

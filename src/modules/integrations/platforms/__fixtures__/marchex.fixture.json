@@ -1,0 +1,37 @@
+{
+  "calls": [
+    {
+      "id": "mc-call-uuid-001",
+      "account_id": "acct-uuid-abc123",
+      "call_date": "2024-03-01",
+      "duration_seconds": 215,
+      "qualified": true,
+      "recording_url": "https://analytics.marchex.io/recordings/mc-call-uuid-001.mp3",
+      "caller_number": "+15551234567",
+      "dialed_number": "+15559876543"
+    },
+    {
+      "id": "mc-call-uuid-002",
+      "account_id": "acct-uuid-abc123",
+      "call_date": "2024-03-01",
+      "duration_seconds": 48,
+      "qualified": false,
+      "recording_url": "https://analytics.marchex.io/recordings/mc-call-uuid-002.mp3",
+      "caller_number": "+15552345678",
+      "dialed_number": "+15559876543"
+    },
+    {
+      "id": "mc-call-uuid-003",
+      "account_id": "acct-uuid-abc123",
+      "call_date": "2024-03-02",
+      "duration_seconds": 381,
+      "qualified": true,
+      "recording_url": "https://analytics.marchex.io/recordings/mc-call-uuid-003.mp3",
+      "caller_number": "+15553456789",
+      "dialed_number": "+15559876543"
+    }
+  ],
+  "total": 3,
+  "limit": 1000,
+  "offset": 0
+}

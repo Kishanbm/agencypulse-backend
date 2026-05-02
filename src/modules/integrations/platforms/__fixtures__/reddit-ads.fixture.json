@@ -1,0 +1,27 @@
+{
+  "data": [
+    {
+      "date": "2024-03-01",
+      "impressions": 32450,
+      "clicks": 734,
+      "spend": 218.40,
+      "conversions": 22,
+      "cpc": 0.298,
+      "ctr": 2.26
+    },
+    {
+      "date": "2024-03-02",
+      "impressions": 34800,
+      "clicks": 792,
+      "spend": 236.10,
+      "conversions": 26,
+      "cpc": 0.298,
+      "ctr": 2.28
+    }
+  ],
+  "meta": {
+    "account_id": "t2_xxxxxxxx",
+    "date_range": "2024-03-01 to 2024-03-31",
+    "total_records": 2
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "reviews": [
+    {
+      "id": "tp-rev-001abc",
+      "stars": 5,
+      "createdAt": "2024-03-05T14:22:00Z",
+      "updatedAt": "2024-03-05T14:22:00Z",
+      "title": "Excellent service!",
+      "text": "Very happy with the product quality and fast delivery.",
+      "consumer": {
+        "displayName": "John D.",
+        "numberOfReviews": 3
+      }
+    },
+    {
+      "id": "tp-rev-002def",
+      "stars": 4,
+      "createdAt": "2024-03-08T09:45:00Z",
+      "updatedAt": "2024-03-08T09:45:00Z",
+      "title": "Good overall experience",
+      "text": "Great product, shipping took a little longer than expected.",
+      "consumer": {
+        "displayName": "Sarah M.",
+        "numberOfReviews": 7
+      }
+    }
+  ],
+  "links": [
+    {
+      "rel": "next-page",
+      "href": "https://api.trustpilot.com/v1/business-units/5abc123def456/reviews?page=2&perPage=100"
+    }
+  ]
+}

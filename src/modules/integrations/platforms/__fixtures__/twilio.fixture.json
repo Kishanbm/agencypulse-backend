@@ -1,0 +1,49 @@
+{
+  "calls": [
+    {
+      "sid": "CA1234567890abcdef1234567890abcdef",
+      "direction": "inbound",
+      "status": "completed",
+      "start_time": "Fri, 01 Mar 2024 09:00:00 +0000",
+      "end_time": "Fri, 01 Mar 2024 09:04:22 +0000",
+      "duration": "262",
+      "from": "+15551234567",
+      "to": "+15559876543",
+      "price": "-0.0085",
+      "price_unit": "USD"
+    },
+    {
+      "sid": "CA2345678901bcdefg2345678901bcdefg",
+      "direction": "outbound-api",
+      "status": "completed",
+      "start_time": "Fri, 01 Mar 2024 14:30:00 +0000",
+      "end_time": "Fri, 01 Mar 2024 14:33:48 +0000",
+      "duration": "228",
+      "from": "+15559876543",
+      "to": "+15552345678",
+      "price": "-0.0085",
+      "price_unit": "USD"
+    },
+    {
+      "sid": "CA3456789012cdefgh3456789012cdefgh",
+      "direction": "inbound",
+      "status": "no-answer",
+      "start_time": "Sat, 02 Mar 2024 10:15:00 +0000",
+      "end_time": "Sat, 02 Mar 2024 10:15:30 +0000",
+      "duration": "30",
+      "from": "+15553456789",
+      "to": "+15559876543",
+      "price": "-0.0085",
+      "price_unit": "USD"
+    }
+  ],
+  "page": 0,
+  "page_size": 1000,
+  "first_page_uri": "/2010-04-01/Accounts/ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/Calls.json?PageSize=1000&Page=0",
+  "next_page_uri": null,
+  "previous_page_uri": null,
+  "uri": "/2010-04-01/Accounts/ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/Calls.json?PageSize=1000&Page=0",
+  "end": 2,
+  "start": 0,
+  "num_pages": 1
+}
