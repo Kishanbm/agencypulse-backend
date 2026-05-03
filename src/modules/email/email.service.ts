@@ -42,6 +42,20 @@ export interface InviteClientUserEmailContext {
   expiresInHours: number;
 }
 
+export interface ForgotPasswordEmailContext {
+  firstName: string;
+  email: string;
+  resetUrl: string;
+  expiresInHours: number;
+}
+
+export interface VerifyEmailContext {
+  firstName: string;
+  agencyName: string;
+  verifyUrl: string;
+  expiresInHours: number;
+}
+
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
@@ -73,6 +87,14 @@ export class EmailService {
 
   async sendInviteClientUser(to: string, ctx: InviteClientUserEmailContext, agencyFrom?: AgencyFrom): Promise<void> {
     await this.send(to, `Access your reports on ${ctx.agencyName}`, 'invite-client-user', ctx as unknown as Record<string, unknown>, agencyFrom);
+  }
+
+  async sendForgotPassword(to: string, ctx: ForgotPasswordEmailContext): Promise<void> {
+    await this.send(to, `Reset your AgencyPulse password`, 'forgot-password', ctx as unknown as Record<string, unknown>);
+  }
+
+  async sendVerifyEmail(to: string, ctx: VerifyEmailContext): Promise<void> {
+    await this.send(to, `Verify your email — ${ctx.agencyName}`, 'verify-email', ctx as unknown as Record<string, unknown>);
   }
 
   async sendRaw(to: string[], subject: string, html: string, agencyFrom?: AgencyFrom): Promise<void> {

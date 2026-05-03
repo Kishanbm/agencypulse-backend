@@ -27,6 +27,13 @@ model Agency {
   trialEndsAt            DateTime?               @map("trial_ends_at") @db.Timestamptz(6)
   isActive               Boolean                 @default(true) @map("is_active")
   ownerId                String?                 @map("owner_id") @db.Uuid
+  website                String?                 @db.VarChar(500)
+  size                   String?                 @db.VarChar(20)
+  country                String?                 @db.VarChar(2)
+  timezone               String?                 @db.VarChar(64)
+  interests              String[]
+  clientCountEstimate    String?                 @map("client_count_estimate") @db.VarChar(20)
+  referralSource         String?                 @map("referral_source") @db.VarChar(50)
   createdAt              DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt              DateTime                @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   owner                  User?                   @relation("AgencyOwner", fields: [ownerId], references: [id], onUpdate: NoAction)
@@ -74,6 +81,11 @@ model User {
   invitationTokenHash                      String?                 @map("invitation_token_hash") @db.VarChar(64)
   invitationExpiresAt                      DateTime?               @map("invitation_expires_at") @db.Timestamptz(6)
   pendingClientId                          String?                 @map("pending_client_id") @db.Uuid
+  phone                                    String?                 @db.VarChar(40)
+  emailVerificationTokenHash               String?                 @map("email_verification_token_hash") @db.VarChar(64)
+  emailVerificationExpiresAt               DateTime?               @map("email_verification_expires_at") @db.Timestamptz(6)
+  passwordResetTokenHash                   String?                 @map("password_reset_token_hash") @db.VarChar(64)
+  passwordResetExpiresAt                   DateTime?               @map("password_reset_expires_at") @db.Timestamptz(6)
   ownedAgency                              Agency[]                @relation("AgencyOwner")
   campaignsCreated                         Campaign[]              @relation("CampaignCreatedBy")
   clientUserAssignedBy                     ClientUserAssignment[]  @relation("ClientUserAssignedBy")
@@ -832,7 +844,8 @@ model AiConversation {
   id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tenantId     String      @map("tenant_id") @db.Uuid
   userId       String      @map("user_id") @db.Uuid
-  campaignId   String      @map("campaign_id") @db.Uuid
+  campaignId   String?     @map("campaign_id") @db.Uuid
+  scope        String      @default("CAMPAIGN") @db.VarChar(20)
   title        String      @default("New Conversation") @db.VarChar(255)
   messageCount Int         @default(0) @map("message_count")
   createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -840,11 +853,12 @@ model AiConversation {
   deletedAt    DateTime?   @map("deleted_at") @db.Timestamptz(6)
   tenant       Agency      @relation(fields: [tenantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user         User        @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  campaign     Campaign    @relation(fields: [campaignId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  campaign     Campaign?   @relation(fields: [campaignId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   messages     AiMessage[]
 
   @@index([tenantId, userId, updatedAt(sort: Desc)], map: "idx_ai_conversations_user")
   @@index([tenantId, campaignId, deletedAt], map: "idx_ai_conversations_campaign")
+  @@index([tenantId, userId, scope, updatedAt(sort: Desc)], map: "idx_ai_conversations_user_scope")
   @@map("ai_conversations")
 }
 

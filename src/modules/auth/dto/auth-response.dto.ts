@@ -9,6 +9,8 @@ export class AuthUserDto {
   @ApiProperty() lastName: string;
   @ApiProperty({ nullable: true }) avatarUrl: string | null;
   @ApiProperty({ enum: UserRole }) role: UserRole;
+  @ApiProperty({ nullable: true, description: 'ISO timestamp when the email was verified, or null if unverified' })
+  emailVerifiedAt: string | null;
 }
 
 export class AuthAgencyDto {

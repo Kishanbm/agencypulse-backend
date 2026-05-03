@@ -9,6 +9,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { AuthCleanupTask } from './auth-cleanup.task';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthCleanupTask } from './auth-cleanup.task';
     // JwtModule registered without a secret — TokenService uses ConfigService
     // to sign/verify with the secret directly, giving per-call control.
     JwtModule.register({}),
+    EmailModule,
   ],
   controllers: [AuthController],
   providers: [

@@ -10,10 +10,13 @@ import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { computePriorPeriod } from '../../common/metrics-utils';
 import { AnthropicClient } from './anthropic.client';
 import { AiConversationService } from './ai-conversation.service';
+import { AiToolsService, TOOL_DEFINITIONS } from './ai-tools.service';
 import { parseIntent } from './intent-parser';
 import { buildChatSystemPrompt, ChatContextPayload } from './prompts/campaign-analyst.prompt';
+import type Anthropic from '@anthropic-ai/sdk';
 
-const MAX_OUTPUT_TOKENS = 1024;
+const MAX_OUTPUT_TOKENS = 1500;
+const MAX_TOOL_ROUNDS = 5;
 const ALL_PLATFORMS: IntegrationPlatform[] = [
   IntegrationPlatform.GA4,
   IntegrationPlatform.GOOGLE_ADS,
@@ -40,6 +43,7 @@ export class AiChatService {
     private readonly metrics: MetricsService,
     private readonly anthropic: AnthropicClient,
     private readonly conversations: AiConversationService,
+    private readonly tools: AiToolsService,
   ) {}
 
   /**
@@ -68,7 +72,7 @@ export class AiChatService {
     campaignId: string,
     conversationId: string,
     userMessage: string,
-  ): Promise<{ content: string; tokenCount: number }> {
+  ): Promise<{ content: string; tokenCount: number; toolCalls: string[] }> {
     // Verify ownership (throws 404 if user doesn't own conversation)
     await this.conversations.getConversation(user, clientId, campaignId, conversationId);
 
@@ -79,28 +83,62 @@ export class AiChatService {
     const client = this.anthropic.getClient();
     const model = this.anthropic.getChatModel();
 
-    let response;
+    const messages: Anthropic.Messages.MessageParam[] = [
+      ...history.map((m) => ({ role: m.role, content: m.content })),
+      { role: 'user', content: userMessage },
+    ];
+
+    const toolCallsLog: string[] = [];
+    let totalOutputTokens = 0;
+    let finalText = '';
+
     try {
-      response = await client.messages.create({
-        model,
-        max_tokens: MAX_OUTPUT_TOKENS,
-        system: systemPrompt,
-        messages: [...history, { role: 'user', content: userMessage }],
-      });
+      for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+        const resp: Anthropic.Messages.Message = await client.messages.create({
+          model,
+          max_tokens: MAX_OUTPUT_TOKENS,
+          system: systemPrompt,
+          tools: TOOL_DEFINITIONS as Anthropic.Messages.Tool[],
+          messages,
+        });
+        totalOutputTokens += resp.usage.output_tokens;
+
+        messages.push({ role: 'assistant', content: resp.content });
+
+        if (resp.stop_reason === 'tool_use') {
+          const toolUses = resp.content.filter(
+            (b): b is Anthropic.Messages.ToolUseBlock => b.type === 'tool_use',
+          );
+          const toolResults = await Promise.all(
+            toolUses.map(async (tu) => {
+              toolCallsLog.push(tu.name);
+              const result = await this.tools.dispatch(user, tu.name, tu.input as Record<string, unknown>);
+              return { type: 'tool_result' as const, tool_use_id: tu.id, content: result };
+            }),
+          );
+          messages.push({ role: 'user', content: toolResults });
+          continue;
+        }
+
+        const textBlocks = resp.content.filter(
+          (b): b is Anthropic.Messages.TextBlock => b.type === 'text',
+        );
+        finalText = textBlocks.map((b) => b.text).join('\n').trim();
+        break;
+      }
+
+      if (!finalText) {
+        finalText = "I had to stop after several tool rounds without a final answer. Try rephrasing.";
+      }
     } catch (err: unknown) {
       this.logger.error(`Claude API failed: ${(err as Error).message}`);
       throw new ServiceUnavailableException('AI assistant temporarily unavailable.');
     }
 
-    const block = response.content[0];
-    const text = block?.type === 'text' ? block.text : '';
-    const outTokens = response.usage.output_tokens;
-
-    // Persist both messages
     await this.conversations.appendMessage(user.tenantId, conversationId, 'user', userMessage);
-    await this.conversations.appendMessage(user.tenantId, conversationId, 'assistant', text, outTokens);
+    await this.conversations.appendMessage(user.tenantId, conversationId, 'assistant', finalText, totalOutputTokens);
 
-    return { content: text, tokenCount: outTokens };
+    return { content: finalText, tokenCount: totalOutputTokens, toolCalls: toolCallsLog };
   }
 
   // ─── Private: streaming runner ─────────────────────────────────────────────

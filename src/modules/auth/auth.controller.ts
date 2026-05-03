@@ -21,6 +21,9 @@ import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 import { AuthResponseDto, RefreshResponseDto } from './dto/auth-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
@@ -162,5 +165,61 @@ export class AuthController {
   @ApiResponse({ status: 200 })
   async me(@CurrentUser() user: AuthenticatedUser): Promise<unknown> {
     return this.authService.getMe(user.id);
+  }
+
+  // ─── POST /auth/forgot-password ────────────────────────────────────────────
+  // Rate-limited: 5 attempts per 15 min per IP. Always returns 200 to prevent
+  // email enumeration — the email only fires when a real account exists.
+
+  @Public()
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 5, ttl: 900_000 } })
+  @ApiOperation({ summary: 'Request a password reset email' })
+  @ApiResponse({ status: 200, description: 'Always succeeds (anti-enumeration)' })
+  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ message: string }> {
+    return this.authService.forgotPassword(dto);
+  }
+
+  // ─── POST /auth/reset-password ─────────────────────────────────────────────
+  // Rate-limited: 10 attempts per 15 min per IP.
+  // Token is single-use — clears the token hash after success.
+
+  @Public()
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 10, ttl: 900_000 } })
+  @ApiOperation({ summary: 'Reset password using a token from the email link' })
+  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
+  async resetPassword(@Body() dto: ResetPasswordDto): Promise<{ message: string }> {
+    return this.authService.resetPassword(dto);
+  }
+
+  // ─── POST /auth/verify-email ───────────────────────────────────────────────
+
+  @Public()
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 20, ttl: 900_000 } })
+  @ApiOperation({ summary: 'Verify email using a token from the verification email' })
+  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
+  async verifyEmail(@Body() dto: VerifyEmailDto): Promise<{ message: string }> {
+    return this.authService.verifyEmail(dto);
+  }
+
+  // ─── POST /auth/resend-verification ────────────────────────────────────────
+  // Rate-limited per user (5 per hour) to prevent email spam.
+
+  @UseGuards(JwtAuthGuard)
+  @Post('resend-verification')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 5, ttl: 3_600_000 } })
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Re-send the verification email to the current user' })
+  @ApiResponse({ status: 200 })
+  async resendVerification(@CurrentUser() user: AuthenticatedUser): Promise<{ message: string }> {
+    return this.authService.resendVerification(user.id);
   }
 }
