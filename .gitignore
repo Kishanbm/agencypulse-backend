@@ -27,3 +27,14 @@ Thumbs.db
 
 # Test coverage
 coverage/
+
+# Temp / scratch files
+*.tmp
+*.mjs
+check-ga4.ts
+seed-ga4-widgets.mjs
+test-ga4-api.mjs
+trigger-ga4-sync.mjs
+*.png
+*.jpg
+*.jpeg
