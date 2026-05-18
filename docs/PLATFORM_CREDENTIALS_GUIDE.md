@@ -1,7 +1,7 @@
 # Platform Credentials Guide
 
 ### 📊 Integration Progress Tracker
-*Last Updated: April 30, 2026*
+*Last Updated: May 4, 2026*
 
 | Platform | Status | Handled? |
 | :--- | :--- | :--- |
@@ -30,6 +30,48 @@
 | **Pinterest Ads** | ❌ **Blocked** | Access denied by Pinterest |
 | **Snapchat Ads** | ❌ **Blocked** | GSTIN requirement |
 | **TikTok Ads** | ❌ **Blocked** | Restricted in India |
+| **Moz** | ⏭️ **Skipped** | Requires credit card for trial API access |
+| **Yelp** | ⏭️ **Skipped** | Moved to a paid-only licensing model in 2026 |
+| **SE Ranking** | ✅ **Connected** | Yes (Site ID: 11976821) |
+| **Google PageSpeed** | ✅ **Connected** | Yes |
+| **Bing Webmaster Tools** | ✅ **Connected** | Yes (API Key + Site URL) |
+| **Majestic SEO** | ⏭️ **Skipped** | API Key requires $400/mo API plan |
+| **AdRoll** | ⏭️ **Skipped** | Account verification email issue |
+| **BrightLocal** | ⏳ **Pending** | Waiting for GBP Manager access |
+| **BrightLocal** | ⏳ **Pending** | Waiting for GBP Manager access |
+| **Trustpilot** | ⏭️ **Skipped** | API access requires Premium/Enterprise plan + Add-on |
+| **Twilio** | ✅ **Connected** | Account SID + Auth Token |
+| **CallRail** | ⏭️ **Skipped** | Requires credit card to unlock dashboard/API |
+| **WhatConverts** | ⏭️ **Skipped** | Requires credit card to start trial |
+| **Vimeo** | ✅ **Connected** | OAuth Client ID + Secret |
+| **Yext** | ⏳ **In Progress** | Troubleshooting Sandbox Token URL 404 |
+| **BigCommerce** | ✅ **Connected** | Store Hash + API Token |
+| **Constant Contact** | ✅ **Connected** | OAuth Client ID + Secret |
+| **Semrush** | ⏭️ **Skipped** | API requires $500/mo Business plan + Units |
+| **Ahrefs** | ⏭️ **Skipped** | API requires a paid subscription plan |
+| **CallTrackingMetrics** | ⏭️ **Skipped** | Requires credit card upfront for trial |
+| **Keap** | ⏳ **Pending** | Waiting for manual account approval |
+| **GatherUp** | ✅ **Connected** | Client ID + Bearer Token |
+| **Salesforce** | ✅ **Connected** | OAuth Client ID + Secret |
+| **Matomo** | ✅ **Connected** | Auth Token + Site URL + Site ID |
+| **Stripe** | ⏭️ **Skipped** | Lead will provide API Key later |
+| **Unbounce** | ⏭️ **Skipped** | Requires manual account approval (2-3 days wait) |
+| **WildJar** | ⏭️ **Skipped** | Manual sales barrier; requires "Let's Talk" form submission |
+| **WhatConverts** | ⏭️ **Skipped** | Requires credit card upfront for 14-day trial |
+| **Delacon** | ⏭️ **Skipped** | Manual sales barrier; requires consultative onboarding |
+| **Birdeye** | ⏭️ **Skipped** | Reputation API is enterprise-only; requires contract |
+| **WooCommerce** | ✅ **Connected** | Consumer Key + Consumer Secret + Site URL |
+| **Gravity Forms** | ✅ **Connected** | Consumer Key + Consumer Secret + Site URL + Form ID |
+| **Google Ad Manager** | ✅ **Connected** | OAuth (Manager Account) |
+| **Google DV360** | ✅ **Connected** | OAuth (Partner Account) |
+| **Google Local Services Ads** | ✅ **Connected** | OAuth (Account ID) |
+| **StackAdapt** | ⏭️ **Skipped** | Manual account evaluation required; no immediate access |
+| **Simpli.fi** | ⏭️ **Skipped** | Requires paid account to generate API keys; no self-serve trial |
+| **Choozle** | ⏭️ **Skipped** | Requires discovery call/demo; no immediate self-serve access |
+| **Spotify Ads** | ✅ **Connected** | OAuth Client ID + Secret |
+| **GroundTruth** | ⏭️ **Skipped** | Dashboard lacks self-serve API keys; requires support request |
+| **Basis Platform** | ⏭️ **Skipped** | Enterprise-only; requires manual onboarding; no self-serve signup |
+| **BrightLocal** | ⏳ **In Progress** | Setting up 14-day trial |
 
 ---
 
@@ -639,9 +681,53 @@
 2. Click your profile avatar in the top-right → **Profile Settings**.
 3. Navigate to the **API** tab.
 4. Your **API Key** is displayed here. Copy it.
-5. In AgencyPulse, paste the API key when prompted.
+5. Navigate to the **Projects** list and click on the project you want to sync.
+6. Look at the URL in your browser. The **Site ID** is the number at the end of the URL (e.g., `online.seranking.com/admin.site.view.html?id=1234567` → `1234567`).
+7. In AgencyPulse, paste both the **API Token** and the **Site ID** when prompted.
 
 **Note:** API access is only available on paid plans.
+ 
+---
+ 
+### Google PageSpeed Insights
+ 
+**Auth type:** API Key
+ 
+**What you need:** A Website URL to audit. An API key is optional but recommended for faster syncing.
+ 
+**Steps:**
+ 
+1. Go to the [Google Cloud Console API Library](https://console.cloud.google.com/apis/library/pagespeedonline.googleapis.com).
+2. Select your project and click **Enable**.
+3. Go to **APIs & Services** → **Credentials** in the left sidebar.
+4. Click **+ CREATE CREDENTIALS** → **API key**.
+5. Copy the key.
+6. In AgencyPulse, paste the **API Key** and enter the **Website URL** you want to audit.
+ 
+**Note:** PageSpeed audits can take up to 60 seconds to complete. The free tier allows for sufficient daily requests for standard client reporting.
+ 
+---
+ 
+### Bing Webmaster Tools
+ 
+**Auth type:** API Key (Recommended) or OAuth (Microsoft)
+ 
+**What you need:** A Bing API Key and your verified Site URL.
+ 
+**Steps (API Key):**
+ 
+1. Log in to [bing.com/webmasters](https://www.bing.com/webmasters).
+2. Click **Settings** (gear icon) → **API Access** → **API Key**.
+3. Generate or copy your API Key.
+4. In AgencyPulse, enter the **API Key** and your **Site URL** (e.g., `https://qodet.com/`).
+ 
+**Steps (OAuth):**
+ 
+1. Ensure your site is added and verified in Bing.
+2. In AgencyPulse, click **Connect** on the Bing card.
+3. Sign in with your Microsoft account and authorize.
+ 
+**Note:** API Key is recommended as it avoids complex Azure app registrations. Data sync includes crawl errors, index status, and keyword performance on Bing.
 
 ---
 
@@ -662,52 +748,22 @@
 
 ---
 
-### Bing Webmaster Tools
-
-**Auth type:** OAuth (Microsoft)
-
-**What you need:** A Microsoft account with verified sites in Bing Webmaster Tools.
-
-**Steps:**
-
-1. Go to [bing.com/webmasters](https://www.bing.com/webmasters) and sign in with your Microsoft account.
-2. Confirm your site is verified and you can see data for it.
-3. In AgencyPulse, click **Connect** on Bing Webmaster Tools.
-4. Complete the Microsoft OAuth flow (same as Microsoft Ads).
-5. After authorization, select the **Site** to connect.
-
 ---
-
+ 
 ### Google Lighthouse
-
+ 
 **Auth type:** No auth required
-
+ 
 **What you need:** A publicly accessible URL and a Google PageSpeed Insights API key (optional, for higher rate limits).
-
+ 
 **Steps:**
-
+ 
 1. Google Lighthouse data is retrieved via the Google PageSpeed Insights API.
 2. For basic use, no API key is needed — the API allows unauthenticated requests at a rate of 1 request / 1 second.
 3. For higher volume: go to [console.cloud.google.com](https://console.cloud.google.com) → **APIs & Services** → **Credentials** → **Create Credentials** → **API Key** → enable the **PageSpeed Insights API**.
 4. In AgencyPulse, enter the **URL** you want to audit and optionally the API key.
-
+ 
 ---
-
-### Google PageSpeed Insights
-
-**Auth type:** API Key (optional for higher rate limits)
-
-**What you need:** A Google Cloud project with PageSpeed Insights API enabled.
-
-**Steps:**
-
-1. Go to [console.cloud.google.com](https://console.cloud.google.com).
-2. Select or create a project.
-3. In the left menu, go to **APIs & Services** → **Library**.
-4. Search for **PageSpeed Insights API** and click **Enable**.
-5. Go to **APIs & Services** → **Credentials** → **Create Credentials** → **API Key**.
-6. Copy the key. Optionally restrict it to the PageSpeed Insights API only.
-7. In AgencyPulse, paste the API key when prompted.
 
 ---
 
@@ -800,17 +856,16 @@
 ### Pinterest (Organic)
 
 **Auth type:** OAuth (Pinterest)
-
+ 
 **What you need:** A Pinterest Business account.
-
+ 
 **Steps:**
-
+ 
 1. Go to [pinterest.com](https://pinterest.com) and ensure your account is a **Pinterest Business** account (not personal).
 2. To convert: **Settings** → **Account Settings** → **Convert to Business**.
 3. In AgencyPulse, click **Connect** on Pinterest.
 4. Complete the Pinterest OAuth flow.
 5. After authorization, the account is linked automatically.
-
 ---
 
 ### X / Twitter (Organic)
@@ -1436,6 +1491,12 @@
 3. Navigate to the **API** tab.
 4. Copy your **API Key** (or click **Generate** if one doesn't exist).
 5. In AgencyPulse, paste the API key when prompted.
+
+**Note for India / International Workaround:**
+If India does not appear in the manual country dropdown, do not use the manual form. Instead:
+1. Choose the **"Connect Google Business Profile"** option during location setup in BrightLocal.
+2. Ensure your email (`kishan@qodet.com`) has **Manager** or **Owner** access to the business on Google.
+3. **What to ask your Lead:** *"Please add kishan@qodet.com as a Manager in the Google Business Profile dashboard so BrightLocal can sync our Indian location data."*
 
 ---
 

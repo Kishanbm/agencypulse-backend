@@ -211,6 +211,12 @@ export class YoutubeOAuthService {
       IntegrationPlatform.YOUTUBE_ANALYTICS,
       { accessToken, externalAccountId: channelId },
     );
+
+    await this.integrationsService.triggerPostConnection(
+      user.tenantId,
+      campaign.id,
+      IntegrationPlatform.YOUTUBE_ANALYTICS,
+    );
   }
 
   private assertConfigured(): void {

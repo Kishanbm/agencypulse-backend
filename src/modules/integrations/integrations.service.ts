@@ -1,19 +1,29 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { UserRole, Prisma, IntegrationPlatform, ConnectionStatus } from '@prisma/client';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 import { PrismaService } from '../../database/prisma.service';
 import { EncryptionService } from '../../common/encryption/encryption.service';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { BillingLimitsService } from '../billing/billing-limits.service';
 import { AuditService } from '../audit/audit.service';
+import { DashboardsService } from '../dashboards/dashboards.service';
 import { UpsertIntegrationDto } from './dto/upsert-integration.dto';
+import { SYNC_QUEUE, SYNC_JOB_NAMES } from '../sync/constants/sync-queue.constants';
+import { SyncJobPayload } from '../sync/dto/sync-job.dto';
+import { buildSyncJobId, defaultDateRange } from '../sync/utils/date.utils';
 
 @Injectable()
 export class IntegrationsService {
+  private readonly logger = new Logger(IntegrationsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly encryption: EncryptionService,
     private readonly billingLimits: BillingLimitsService,
     private readonly audit: AuditService,
+    private readonly dashboards: DashboardsService,
+    @InjectQueue(SYNC_QUEUE) private readonly syncQueue: Queue,
   ) {}
 
   // ─── Upsert ────────────────────────────────────────────────────────────────
@@ -34,7 +44,7 @@ export class IntegrationsService {
     // Plan gate: only count NEW connections (not token refreshes on existing ones)
     const existingConnection = await this.prisma.integrationConnection.findUnique({
       where: { campaignId_platform: { campaignId, platform: dto.platform } },
-      select: { id: true },
+      select: { id: true, externalAccountId: true },
     });
     if (!existingConnection) {
       await this.billingLimits.assertWithinLimits(user.tenantId, 'integrations', { campaignId });
@@ -92,7 +102,60 @@ export class IntegrationsService {
       select: this.publicSelect(),
     });
 
+    // Seed default dashboard widgets when platform is fully connected for the first time.
+    // Two cases:
+    //   1. OAuth platforms (GA4, GSC, etc.): externalAccountId just set for the first time
+    //   2. Direct API-key platforms: brand-new connection with an access token
+    const isFirstPropertySet = dto.externalAccountId && !existingConnection?.externalAccountId;
+    const isNewApiKeyConnection = !existingConnection && dto.accessToken;
+    if (isFirstPropertySet || isNewApiKeyConnection) {
+      await this.dashboards.seedPlatformWidgets(user.tenantId, campaignId, dto.platform).catch((err: unknown) => {
+        this.logger.warn(`Failed to seed widgets for ${dto.platform}: ${(err as Error).message}`);
+      });
+    }
+
+    // Dispatch immediate sync when externalAccountId is being set on a connected integration.
+    // Use a timestamp suffix on the jobId to bypass BullMQ deduplication — the earlier
+    // job (dispatched before property was selected) already completed as a no-op and
+    // holds the standard jobId, so we need a fresh ID to force a real sync.
+    if (dto.externalAccountId && !dto.accessToken) {
+      const jobName = SYNC_JOB_NAMES[dto.platform];
+      if (jobName) {
+        const range = defaultDateRange();
+        const jobId = buildSyncJobId(user.tenantId, campaignId, dto.platform, range.from, range.to) + `|${Date.now()}`;
+        const payload: SyncJobPayload = { tenantId: user.tenantId, campaignId, campaignName: '', platform: dto.platform, dateRange: range };
+        await this.syncQueue.add(jobName, payload, { jobId }).catch((err: unknown) => {
+          this.logger.warn(`Failed to dispatch sync after property set for ${dto.platform}: ${(err as Error).message}`);
+        });
+      }
+    }
+
     return connection;
+  }
+
+  // ─── Post-connection actions ───────────────────────────────────────────────
+  // Called by OAuth flows that use a two-step connect (OAuth → property selection).
+  // Runs widget seeding and dispatches an immediate sync, mirroring what upsertConnection
+  // does when externalAccountId is set for the first time.
+
+  async triggerPostConnection(
+    tenantId: string,
+    campaignId: string,
+    platform: IntegrationPlatform,
+  ): Promise<void> {
+    await this.dashboards.seedPlatformWidgets(tenantId, campaignId, platform).catch((err: unknown) => {
+      this.logger.warn(`Failed to seed widgets for ${platform}: ${(err as Error).message}`);
+    });
+
+    const jobName = SYNC_JOB_NAMES[platform];
+    if (jobName) {
+      const range = defaultDateRange();
+      const jobId = buildSyncJobId(tenantId, campaignId, platform, range.from, range.to) + `|${Date.now()}`;
+      const payload: SyncJobPayload = { tenantId, campaignId, campaignName: '', platform, dateRange: range };
+      await this.syncQueue.add(jobName, payload, { jobId }).catch((err: unknown) => {
+        this.logger.warn(`Failed to dispatch sync after property set for ${platform}: ${(err as Error).message}`);
+      });
+    }
   }
 
   // ─── List for campaign ─────────────────────────────────────────────────────
@@ -231,6 +294,24 @@ export class IntegrationsService {
         lastErrorMessage: null,
       },
     });
+
+    // Only dispatch immediate sync when externalAccountId is already known.
+    // OAuth platforms that need a property picker (GA4, GSC, etc.) will have
+    // externalAccountId = null here — the sync fires from upsert() instead,
+    // after the user selects a property. Dispatching without externalAccountId
+    // causes the job to complete silently (getActiveConnection skips it) and
+    // the jobId gets marked "done" in Redis, blocking the real sync via dedup.
+    if (tokens.externalAccountId) {
+      const jobName = SYNC_JOB_NAMES[platform];
+      if (jobName) {
+        const range = defaultDateRange();
+        const jobId = buildSyncJobId(tenantId, campaignId, platform, range.from, range.to);
+        const payload: SyncJobPayload = { tenantId, campaignId, campaignName: '', platform, dateRange: range };
+        await this.syncQueue.add(jobName, payload, { jobId }).catch((err: unknown) => {
+          this.logger.warn(`Failed to dispatch immediate sync for ${platform}: ${(err as Error).message}`);
+        });
+      }
+    }
   }
 
   // ─── getDecryptedTokens — INTERNAL USE ONLY ────────────────────────────────

@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { MetricRowInput } from '../../metrics/dto/query-metrics.dto';
 import { fetchWithRetry } from '../../../common/http/fetch-with-retry';
-import { safeInt, safeFloat, safeStr } from '../../../common/utils/safe-parse';
+import { safeInt } from '../../../common/utils/safe-parse';
 
 /**
  * Campaign Monitor API service — email campaign performance.
@@ -65,22 +65,25 @@ export class CampaignMonitorApiService {
       );
     }
 
-    const campaigns = await resp.json() as Array<{
-      CampaignID: string;
-      SentDate: string;    // "YYYY-MM-DD HH:MM:SS"
-      TotalRecipients: number;
-      Opens: number;
-      UniqueOpens: number;
-      Clicks: number;
-      UniqueClicks: number;
-      Unsubscribed: number;
-      Bounced: number;
-      SpamComplaints: number;
-    }>;
+    const body = await resp.json() as {
+      Results: Array<{
+        CampaignID: string;
+        SentDate: string;    // "YYYY-MM-DD HH:MM:SS"
+        TotalRecipients: number;
+        Opens: number;
+        UniqueOpens: number;
+        Clicks: number;
+        UniqueClicks: number;
+        Unsubscribed: number;
+        Bounced: number;
+        SpamComplaints: number;
+      }>;
+    };
+    const campaigns = body.Results ?? [];
 
     const rows: MetricRowInput[] = [];
 
-    for (const c of campaigns ?? []) {
+    for (const c of campaigns) {
       const recordedAt = c.SentDate ? c.SentDate.slice(0, 10) : dateRange.to;
 
       if (c.TotalRecipients > 0)  rows.push({ metricKey: 'sends',        value: String(safeInt(c.TotalRecipients)), recordedAt });

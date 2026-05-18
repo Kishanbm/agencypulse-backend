@@ -40,7 +40,8 @@ export class Ga4ApiService {
     );
 
     if (!response.ok) {
-      throw new BadRequestException('Failed to fetch GA4 properties. Check connection status.');
+      const body = await response.text().catch(() => '');
+      throw new BadRequestException(`GA4 Admin API error (HTTP ${response.status}): ${body.slice(0, 300)}`);
     }
 
     const data = await response.json() as {
@@ -101,8 +102,9 @@ export class Ga4ApiService {
     );
 
     if (!response.ok) {
+      const body = await response.text().catch(() => '');
       throw new BadRequestException(
-        'GA4 report request failed. Check that the property ID is correct.',
+        `GA4 Data API error (HTTP ${response.status}): ${body.slice(0, 400)}`,
       );
     }
 

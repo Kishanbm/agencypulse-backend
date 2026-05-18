@@ -1,12 +1,29 @@
 # Build Progress Tracker
 
-Last updated: 2026-04-29 (Phase 3.8 — platform catalog expanded to 85 platforms, stub OAuth/API-key connect layer implemented and research-verified)
+Last updated: 2026-05-15 (Phase 5 real-data testing — GA4 ✅ complete, GSC ✅ complete with 6 bugs found and fixed)
 
 ---
 
 ## Current Status
-**Phase**: Backend complete through 8.12 + 3.7 + 3.8 + Audit Log + Notifications + AgencyOverview + Portal Summary ✅ · Frontend Phase A ✅ · Frontend B1–B16 + Portal Enhancements ✅
-**Current Task**: Phase 3.8 complete ✅ · 85 platforms auth-connect ready · Next: wire connect flows in frontend DataSources page, then implement per-platform sync methods
+**Phase**: Phase 5 — Real-data testing platform-by-platform
+**Completed**: GA4 ✅ · GSC ✅ (6 bugs fixed)
+**Completed**: GA4 ✅ · GSC ✅ · Platform logo badges on widgets ✅ · scrimverse.com GSC verified ✅
+**Current Task**: YouTube Analytics real-data test
+
+### Phase 5 — Real-Data Testing: Google Search Console (2026-05-15) ✅
+- Connected GSC for techqwaz.com via Google OAuth two-step flow (OAuth → site picker → property saved)
+- Built `GscSitePickerModal` component in `IntegrationsPage.tsx` — mirrors GA4 property picker pattern
+- Added `triggerPostConnection()` to `IntegrationsService` — reusable method for two-step OAuth platforms
+- Fixed 6 bugs (see FEATURES.md Phase 5 section for full list)
+- Real data confirmed: 28 rows × 4 metrics (clicks, impressions, CTR, avg position)
+- All 5 GSC widgets auto-seeding and displaying: Clicks KPI, Impressions KPI, CTR KPI, Avg Position KPI, Clicks & Impressions chart
+- scrimverse.com pending GSC verification — to be done next session
+
+### Phase 5 — Real-Data Testing: GA4 (2026-05-14) ✅
+- Enabled `analyticsdata.googleapis.com` API in GCP project 433517348838
+- Connected GA4 for techqwaz.com (property 318396549) and scrimverse.com
+- Real data confirmed: sessions 46, users 25, new users 16, page views 748, bounce rate 32.7%, session duration 23m 8s
+- All 7 GA4 widgets auto-seeding and displaying correctly
 
 ### Phase 3.9 Testing Harness — Platform Integration Tests + Test-Connection Endpoint (2026-04-29) ✅
 - `src/common/http/fetch-with-retry.ts` — 429 retry wrapper with Retry-After support + exponential backoff

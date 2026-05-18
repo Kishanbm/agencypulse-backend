@@ -243,6 +243,127 @@ Generate separate values for Qodet internal and B2B deployments. Never reuse the
 
 ---
 
+## Custom Domain White Labeling — How It Actually Works
+
+### What "custom domain" means in practice
+
+When an agency sets `analytics.klantroef.com` as their custom domain in Settings → Branding:
+- That value is saved to the `agencies.custom_domain` column in the DB
+- `HostResolutionService` reads the HTTP `Host` header on every request and looks up which agency owns that domain
+- Result is cached in Redis for 5 minutes
+
+**This alone is not enough.** The agency must also do a DNS step on their side.
+
+### What the agency must do (mandatory)
+
+The agency goes to their domain registrar (GoDaddy, Cloudflare, Namecheap, etc.) and adds:
+
+```
+Type:  CNAME
+Name:  analytics          ← whatever subdomain they want
+Value: app.agencypulse.com  ← points to AgencyPulse servers
+```
+
+Without this DNS step, `analytics.klantroef.com` will never reach the AgencyPulse server. The DB field alone does nothing.
+
+### The full request flow after DNS is set up
+
+```
+Nike types analytics.klantroef.com
+  → DNS: CNAME → app.agencypulse.com → AgencyPulse server IP
+  → HTTP request arrives with Host: analytics.klantroef.com
+  → HostResolutionService: SELECT agency WHERE custom_domain = 'analytics.klantroef.com'
+  → Finds Klantroef agency → loads their branding
+  → Nike sees Klantroef branded platform
+```
+
+### SSL certificates for custom domains — NOT YET IMPLEMENTED
+
+This is a known gap. For `https://analytics.klantroef.com` to work without browser security warnings, AgencyPulse needs an SSL certificate for that specific domain.
+
+**Two options to implement when this is needed:**
+
+| Option | How | Complexity |
+|---|---|---|
+| **Cloudflare for SaaS** | Agency proxies through Cloudflare, SSL handled automatically per custom domain | Low — Cloudflare API does the heavy lifting |
+| **Let's Encrypt per domain** | When agency saves custom domain, backend triggers ACME challenge to issue a cert | Medium — needs cert storage + renewal automation |
+
+**Recommended: Cloudflare for SaaS** — it is purpose-built for exactly this use case (SaaS platforms with thousands of tenant custom domains). Each tenant just sets their CNAME, Cloudflare issues and renews their SSL automatically.
+
+### Pre-launch checklist addition for custom domains
+
+- [ ] Decide on SSL approach: Cloudflare for SaaS vs Let's Encrypt automation
+- [ ] If Cloudflare for SaaS: set up the fallback origin + custom hostname API
+- [ ] Document the DNS setup steps for agency onboarding (what CNAME to add + where)
+- [ ] Add domain verification step in UI so agency can confirm DNS is set up correctly before saving
+
+### How AgencyAnalytics handles this — and what we should copy
+
+AgencyAnalytics uses **Cloudflare for SaaS** (also called Cloudflare Custom Hostnames). Their exact flow:
+
+**Step 1 — Agency enters domain in settings**
+Agency types `analytics.klantroef.com` in AgencyAnalytics settings and clicks Save.
+
+**Step 2 — AgencyAnalytics calls Cloudflare API automatically**
+Behind the scenes, their backend immediately calls:
+```
+POST https://api.cloudflare.com/client/v4/zones/{zone_id}/custom_hostnames
+{
+  "hostname": "analytics.klantroef.com",
+  "ssl": { "method": "http", "type": "dv" }
+}
+```
+This tells Cloudflare: "register this hostname, prepare an SSL cert for it."
+
+**Step 3 — AgencyAnalytics shows DNS instructions to the agency**
+After saving, the agency sees:
+```
+To activate your custom domain, add this DNS record:
+
+Type:  CNAME
+Name:  analytics
+Value: custom.agencyanalytics.com
+
+Once added, your domain will be live within minutes.
+```
+
+**Step 4 — Cloudflare watches for the DNS change**
+The moment the agency adds the CNAME in their registrar:
+- Cloudflare detects it automatically
+- Issues a free DV SSL certificate for `analytics.klantroef.com`
+- Domain goes live with HTTPS — no manual work needed from the AgencyAnalytics team
+
+**Step 5 — Request flow after activation**
+```
+Nike visits analytics.klantroef.com
+  → DNS: CNAME → custom.agencyanalytics.com → Cloudflare edge
+  → Cloudflare has SSL cert for this domain → HTTPS works
+  → Cloudflare proxies to AgencyAnalytics origin server
+  → AgencyAnalytics reads Host header → looks up Klantroef tenant
+  → Returns Klantroef branded platform
+```
+
+**Why Cloudflare for SaaS is the right approach for AgencyPulse too:**
+
+| Problem | Cloudflare for SaaS Solution |
+|---|---|
+| SSL cert per custom domain | Cloudflare issues + renews automatically |
+| Thousands of agency domains | Handles unlimited custom hostnames |
+| DNS verification | Cloudflare polls and activates automatically |
+| DDoS protection | Proxy protects all domains included |
+| Cost | ~$2/month per active custom hostname |
+
+**Implementation plan when we build this:**
+1. Sign up for Cloudflare for SaaS on the AgencyPulse Cloudflare zone
+2. When agency saves custom domain → call Cloudflare Custom Hostnames API
+3. Show agency the CNAME to add (pointing to our Cloudflare fallback origin)
+4. Poll Cloudflare API to check verification status → update domain status in DB
+5. Show "Active" / "Pending DNS" status in the branding settings UI
+
+This is the production-grade approach we should implement when custom domains are enabled for real agency onboarding.
+
+---
+
 ## Recommended Hosting Stack
 
 | Component | Recommended | Alternative |

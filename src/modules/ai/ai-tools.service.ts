@@ -122,6 +122,19 @@ export const TOOL_DEFINITIONS = [
       required: ['campaignId', 'reportId'],
     },
   },
+  {
+    name: 'create_and_generate_report',
+    description: 'Create a brand-new report from scratch for a campaign and immediately generate its PDF. Use this when the user asks to "create a new report", "generate a summary report", or "make a report" — i.e. when no existing report fits. Infer a sensible name from their request. Returns the new reportId and a downloadUrl.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        campaignId: { type: 'string', description: 'Campaign UUID to create the report for.' },
+        name:       { type: 'string', description: 'Report name, e.g. "May 2025 Performance Summary" or "Test Client 1 — Quick Summary".' },
+        days:       { type: 'number', description: 'Date window in days for the generated PDF (default 30).' },
+      },
+      required: ['campaignId', 'name'],
+    },
+  },
 ];
 
 @Injectable()
@@ -149,7 +162,8 @@ export class AiToolsService {
         case 'get_recent_alerts':       return JSON.stringify(await this.getRecentAlerts(user, input));
         case 'find_underperforming_goals': return JSON.stringify(await this.findUnderperformingGoals(user, input));
         case 'get_integration_health':  return JSON.stringify(await this.getIntegrationHealth(user, input));
-        case 'generate_report_pdf':     return JSON.stringify(await this.generateReportPdf(user, input));
+        case 'generate_report_pdf':          return JSON.stringify(await this.generateReportPdf(user, input));
+        case 'create_and_generate_report':   return JSON.stringify(await this.createAndGenerateReport(user, input));
         default:
           return JSON.stringify({ error: `Unknown tool: ${toolName}` });
       }
@@ -430,6 +444,27 @@ export class AiToolsService {
       message: result.cached
         ? `Reused existing PDF generated earlier today.`
         : `Fresh PDF generated for the last ${days} days.`,
+    };
+  }
+
+  // ─── create_and_generate_report ───────────────────────────────────────────
+  private async createAndGenerateReport(user: AuthenticatedUser, input: Record<string, unknown>) {
+    const campaignId = String(input.campaignId);
+    const name = String(input.name);
+    const days = typeof input.days === 'number' ? input.days : 30;
+
+    const report = await this.reports.create(user, campaignId, { name, sections: [] });
+    const result = await this.reports.generatePdf(user, campaignId, report.id, days);
+
+    return {
+      reportId: report.id,
+      reportName: report.name,
+      downloadUrl: result.downloadUrl,
+      generatedAt: result.generatedAt instanceof Date
+        ? result.generatedAt.toISOString()
+        : (result.generatedAt as unknown as string),
+      windowDays: days,
+      message: `Created report "${name}" and generated PDF for the last ${days} days.`,
     };
   }
 

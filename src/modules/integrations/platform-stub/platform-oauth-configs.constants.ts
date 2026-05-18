@@ -81,7 +81,7 @@ export const OAUTH_PLATFORM_CONFIGS = new Map<IntegrationPlatform, OAuthPlatform
       authEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
       tokenEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
       // Verified scope: https://learn.microsoft.com/en-us/bingwebmaster/oauth2
-      scopes: 'https://webmaster.bing.com/api/webmaster.manage offline_access',
+      scopes: 'https://webmaster.bing.com/api/webmaster.manage',
       hasRefreshToken: true,
     },
   ],
@@ -465,7 +465,6 @@ export const OAUTH_PLATFORM_CONFIGS = new Map<IntegrationPlatform, OAuthPlatform
       requiresShopDomain: true,
     },
   ],
-
   // ─── BigCommerce (per-shop OAuth) ────────────────────────────────────────────
   // Callback receives `context` query param (e.g. "stores/abc123") which must
   // be forwarded in the token exchange POST body.
@@ -485,7 +484,28 @@ export const OAUTH_PLATFORM_CONFIGS = new Map<IntegrationPlatform, OAuthPlatform
     },
   ],
 
-  // ─── Yext ───────────────────────────────────────────────────────────────────
+  // ─── Trustpilot ─────────────────────────────────────────────────────────────
+  // Authorization code flow with Basic auth for token exchange.
+  // Access token TTL: 100 hours. Refresh token TTL: 30 days.
+  // Scopes: not used by Trustpilot — access is determined by app registration.
+  // Ref: https://developers.trustpilot.com/authentication
+  [
+    IntegrationPlatform.TRUSTPILOT,
+    {
+      platform: IntegrationPlatform.TRUSTPILOT,
+      clientIdKey: 'trustpilot.clientId',
+      clientSecretKey: 'trustpilot.clientSecret',
+      redirectUriKey: 'trustpilot.redirectUri',
+      authEndpoint: 'https://authenticate.trustpilot.com',
+      tokenEndpoint: 'https://api.trustpilot.com/v1/oauth/oauth-business-users-for-applications/accesstoken',
+      scopes: '',
+      hasRefreshToken: true,
+      tokenTtlMs: 100 * 60 * 60 * 1000, // 100 hours
+      useBasicAuth: true,
+    },
+  ],
+
+  // ─── Yext (Sandbox Mode) ───────────────────────────────────────────────────
   [
     IntegrationPlatform.YEXT,
     {
@@ -493,8 +513,8 @@ export const OAUTH_PLATFORM_CONFIGS = new Map<IntegrationPlatform, OAuthPlatform
       clientIdKey: 'yext.clientId',
       clientSecretKey: 'yext.clientSecret',
       redirectUriKey: 'yext.redirectUri',
-      authEndpoint: 'https://www.yext.com/oauth2/authorize',
-      tokenEndpoint: 'https://api.yext.com/oauth2/token',
+      authEndpoint: 'https://sandbox.yext.com/oauth2/authorize',
+      tokenEndpoint: 'https://sandbox.yext.com/oauth2/token',
       scopes: 'listings analytics',
       hasRefreshToken: true,
     },

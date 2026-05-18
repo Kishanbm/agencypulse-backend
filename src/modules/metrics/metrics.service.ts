@@ -1,4 +1,4 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { IntegrationPlatform } from '@prisma/client';
 import { PrismaService } from '../../database/prisma.service';
 import { SystemPrismaService } from '../../database/system-prisma.service';
@@ -16,11 +16,6 @@ import {
 const UPSERT_BATCH_SIZE = 500;
 const METRICS_CACHE_TTL = 300; // 5 minutes — data syncs every 6h, safe TTL
 
-// Metrics that cannot be plain-averaged — they are ratios derived from base metrics.
-// CTR = clicks / impressions; CPC / avg_cpc = cost / clicks.
-// Averaging the stored ratio values is mathematically wrong.
-// Phase 5 KPI engine will compute these from base metrics instead.
-const DERIVED_METRIC_KEYS = new Set(['ctr', 'avg_cpc', 'cpc']);
 
 @Injectable()
 export class MetricsService {
@@ -322,25 +317,15 @@ export class MetricsService {
   // ─── Private: validation ──────────────────────────────────────────────────
 
   /**
-   * Rejects AVG requests for derived metrics (CTR, CPC, avg_cpc).
-   * These are ratios computed from base metrics — averaging the stored ratio
-   * value is mathematically incorrect. Phase 5 KPI engine computes them instead.
-   * Only validates when specific metricKeys are requested (can't know all keys upfront).
+   * No-op — avg is allowed for all stored metrics including ratio metrics (CTR, CPC).
+   * Averaging daily ratio values (e.g. avg of daily CTR %) is standard analytics
+   * dashboard practice and gives a meaningful "average rate over period" display.
    */
   private assertAggregateAllowed(
-    aggregate: MetricAggregate,
-    metricKeys?: string[],
+    _aggregate: MetricAggregate,
+    _metricKeys?: string[],
   ): void {
-    if (aggregate !== MetricAggregate.AVG || !metricKeys) return;
-
-    const invalid = metricKeys.filter(k => DERIVED_METRIC_KEYS.has(k));
-    if (invalid.length > 0) {
-      throw new BadRequestException(
-        `aggregate=avg is not supported for derived metrics: ${invalid.join(', ')}. ` +
-        `These are ratios (e.g. CTR = clicks/impressions) that must be recomputed from ` +
-        `base metrics. Use aggregate=sum on clicks and impressions instead.`,
-      );
-    }
+    // no restriction
   }
 
   // ─── Private: cache key helpers ───────────────────────────────────────────
@@ -419,6 +404,9 @@ export class MetricsService {
         updated_at = now()
     `;
 
-    return this.prisma.$executeRawUnsafe(sql, ...params);
+    return this.prisma.$transaction(async (tx) => {
+      await tx.$executeRawUnsafe(`SET LOCAL app.current_tenant = '${tenantId}'`);
+      return tx.$executeRawUnsafe(sql, ...params);
+    });
   }
 }

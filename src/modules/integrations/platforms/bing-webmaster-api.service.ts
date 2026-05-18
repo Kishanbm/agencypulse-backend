@@ -55,10 +55,11 @@ export class BingWebmasterApiService {
       siteUrl,
       startDate,
       endDate,
+      apikey: accessToken, // Bing API key can be passed here
     });
 
     const url = `${this.BASE}/GetRankAndTrafficStats?${params.toString()}`;
-    const resp = await fetchWithRetry(url, { headers: this.headers(accessToken) });
+    const resp = await fetchWithRetry(url);
 
     if (resp.status === 401) {
       throw new BadRequestException('Bing Webmaster Tools access token expired. Please reconnect.');

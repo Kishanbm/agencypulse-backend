@@ -183,7 +183,10 @@ export class GscOAuthService {
     });
 
     if (!response.ok) {
-      throw new BadRequestException('Failed to fetch Search Console sites.');
+      const body = await response.text().catch(() => '');
+      throw new BadRequestException(
+        `Failed to fetch Search Console sites (HTTP ${response.status}): ${body.slice(0, 400)}`,
+      );
     }
 
     const data = await response.json() as {
@@ -235,6 +238,15 @@ export class GscOAuthService {
       campaign.id,
       IntegrationPlatform.GOOGLE_SEARCH_CONSOLE,
       { accessToken, externalAccountId: siteUrl },
+    );
+
+    // Seed default widgets and dispatch immediate sync — same as upsertConnection does
+    // when externalAccountId is set for the first time on any OAuth platform.
+    // Must be awaited (not void) so it runs within the active request/RLS tenant context.
+    await this.integrationsService.triggerPostConnection(
+      user.tenantId,
+      campaign.id,
+      IntegrationPlatform.GOOGLE_SEARCH_CONSOLE,
     );
   }
 

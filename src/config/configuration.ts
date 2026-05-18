@@ -265,6 +265,11 @@ export default () => ({
     clientSecret: process.env.VIMEO_CLIENT_SECRET,
     redirectUri: process.env.VIMEO_REDIRECT_URI,
   },
+  trustpilot: {
+    clientId: process.env.TRUSTPILOT_CLIENT_ID,
+    clientSecret: process.env.TRUSTPILOT_CLIENT_SECRET,
+    redirectUri: process.env.TRUSTPILOT_REDIRECT_URI,
+  },
   snowflake: {
     account: process.env.SNOWFLAKE_ACCOUNT,
     username: process.env.SNOWFLAKE_USERNAME,

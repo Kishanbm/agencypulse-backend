@@ -655,12 +655,13 @@ export class IntegrationSyncProcessor extends WorkerHost {
         );
 
         // GSC metrics: clicks, impressions, ctr, position — all keyed by date
+        // ctr from GSC API is 0–1 decimal; multiply by 100 to store as whole-number percent
         const metricRows: MetricRowInput[] = [];
         for (const row of rows) {
           metricRows.push(
             { metricKey: 'clicks', value: String(row.clicks), recordedAt: row.date },
             { metricKey: 'impressions', value: String(row.impressions), recordedAt: row.date },
-            { metricKey: 'ctr', value: String(row.ctr), recordedAt: row.date },
+            { metricKey: 'ctr', value: String(row.ctr * 100), recordedAt: row.date },
             { metricKey: 'position', value: String(row.position), recordedAt: row.date },
           );
         }
@@ -1104,13 +1105,21 @@ export class IntegrationSyncProcessor extends WorkerHost {
     await this.tenantContext.run(tenantId, async () => {
       const connection = await this.getActiveConnection(job.id!, tenantId, campaignId, platform);
       if (!connection) return;
+      // Try API Key first, fallback to OAuth
       let accessToken: string;
-      try {
-        accessToken = await this.standardToken.getValidAccessToken(platform, tenantId, campaignId);
-      } catch (err) {
-        await this.integrationsService.markExpired(tenantId, campaignId, platform, (err as Error).message);
-        this.logger.error(`[${job.id}] Bing Webmaster token expired — marked EXPIRED`, { tenantId, campaignId });
-        return;
+      const tokens = await this.integrationsService.getDecryptedTokens(tenantId, campaignId, platform);
+      
+      // If we have an accessToken but no refreshToken, it's likely a static API Key
+      if (tokens?.accessToken && !tokens?.refreshToken) {
+        accessToken = tokens.accessToken;
+      } else {
+        try {
+          accessToken = await this.standardToken.getValidAccessToken(platform, tenantId, campaignId);
+        } catch (err) {
+          await this.integrationsService.markExpired(tenantId, campaignId, platform, (err as Error).message);
+          this.logger.error(`[${job.id}] Bing Webmaster token expired — marked EXPIRED`, { tenantId, campaignId });
+          return;
+        }
       }
       await this.executeWithErrorHandling(job, tenantId, campaignId, platform, async () => {
         const metricRows = await this.bingWebmasterApi.fetchCoreMetrics(accessToken, connection.externalAccountId ?? 'default', { from: dateRange.from, to: dateRange.to });

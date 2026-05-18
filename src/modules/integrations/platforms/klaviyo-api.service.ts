@@ -1,7 +1,6 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { MetricRowInput } from '../../metrics/dto/query-metrics.dto';
 import { fetchWithRetry } from '../../../common/http/fetch-with-retry';
-import { safeInt, safeFloat, safeStr } from '../../../common/utils/safe-parse';
 
 /**
  * Klaviyo API service — fetches email campaign performance metrics.
@@ -92,18 +91,10 @@ export class KlaviyoApiService {
     apiKey: string,
     dateRange: { from: string; to: string },
   ): Promise<Array<{ id: string; send_time: string | null }>> {
-    // Filter for email campaigns sent within the date range.
-    // Klaviyo filter syntax uses RFC3339 timestamps.
-    const fromTs = `${dateRange.from}T00:00:00Z`;
-    const toTs = `${dateRange.to}T23:59:59Z`;
-
-    const filter = [
-      `equals(messages.channel,'email')`,
-      `greater-or-equal(send_time,${fromTs})`,
-      `less-or-equal(send_time,${toTs})`,
-    ].join(',');
-
-    const url = `${this.BASE}/api/campaigns/?filter=and(${encodeURIComponent(filter)})&page[size]=100&fields[campaign]=send_time,status`;
+    // Klaviyo does not support filtering by send_time on the campaigns list endpoint.
+    // Fetch all email campaigns and filter by send_time in-memory.
+    const filter = encodeURIComponent(`equals(messages.channel,'email')`);
+    const url = `${this.BASE}/api/campaigns/?filter=${filter}&fields[campaign]=send_time,status`;
 
     const resp = await fetchWithRetry(url, { headers: this.headers(apiKey) });
 
@@ -118,10 +109,17 @@ export class KlaviyoApiService {
       data: Array<{ id: string; attributes: { send_time: string | null } }>;
     };
 
-    return (body.data ?? []).map((d) => ({
-      id: d.id,
-      send_time: d.attributes.send_time,
-    }));
+    // Filter in-memory: only campaigns whose send_time falls in the date range
+    const from = new Date(`${dateRange.from}T00:00:00Z`).getTime();
+    const to   = new Date(`${dateRange.to}T23:59:59Z`).getTime();
+
+    return (body.data ?? [])
+      .map((d) => ({ id: d.id, send_time: d.attributes.send_time }))
+      .filter((c) => {
+        if (!c.send_time) return false;
+        const t = new Date(c.send_time).getTime();
+        return t >= from && t <= to;
+      });
   }
 
   // ─── Private: fetch campaign stats ───────────────────────────────────────────
@@ -129,7 +127,7 @@ export class KlaviyoApiService {
   private async fetchCampaignStats(
     apiKey: string,
     campaignIds: string[],
-    dateRange: { from: string; to: string },
+    _dateRange: { from: string; to: string },
   ): Promise<Array<{
     id: string;
     attributes: {

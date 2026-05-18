@@ -58,6 +58,31 @@ Tracks every feature built — status, what was implemented, and notes.
 | T-6 | Platform Jest tests (76 files, 340 tests) | DONE | All 340 tests passing; covers golden path, empty, null fields, auth error, pagination |
 | T-7 | POST /sync/test-connection | DONE | Read-only probe endpoint — AGENCY_ADMIN+, last 7 days, returns rowCount + sampleRows |
 
+## Phase 5: Real-Data Testing (platform-by-platform)
+
+### Platform Bugs Found During Testing
+
+| # | Platform | Bug | Fix | Status |
+|---|----------|-----|-----|--------|
+| P5-GA4-1 | GA4 | GA4 Data API not enabled in GCP project | Enabled `analyticsdata.googleapis.com` in GCP console | FIXED |
+| P5-GSC-1 | GSC | No site picker modal shown after OAuth callback | Built `GscSitePickerModal` in `IntegrationsPage.tsx`; added `?connected=google-search-console` detection in useEffect | FIXED |
+| P5-GSC-2 | GSC | `selectSite` bypassed auto-seed + sync dispatch | Added `triggerPostConnection()` to `IntegrationsService`; called from `selectSite` with `await` | FIXED |
+| P5-GSC-3 | GSC | Widget seeding race condition — widgets not in DB when dashboard loaded | Changed `seedPlatformWidgets` from fire-and-forget to `await` in both `upsert` and `triggerPostConnection` | FIXED |
+| P5-GSC-4 | GSC | CTR stored as 0–1 decimal (GSC API native), displayed as 0.045% instead of 4.5% | Multiply by 100 at storage: `String(row.ctr * 100)` in sync processor | FIXED |
+| P5-GSC-5 | GSC | CTR widget showing "No data for selected range" | Removed `DERIVED_METRIC_KEYS` restriction in `metrics.service.ts` that blocked `avg` aggregation for CTR; averaging daily CTR % is valid analytics practice | FIXED |
+| P5-GSC-6 | GSC | Widget data errors silently swallowed — no log trace | Changed bare `catch {}` in `dashboards.service.ts` to `catch (err)` with `this.logger.warn(...)` | FIXED |
+
+### Real-Data Test Results
+
+| Platform | Property | Status | Data Confirmed | Notes |
+|----------|----------|--------|---------------|-------|
+| GA4 | techqwaz.com (property ID: 318396549) | TESTED | Sessions, Users, New Users, Page Views, Bounce Rate, Session Duration, Sessions chart | Full dashboard working |
+| Google Search Console | techqwaz.com + scrimverse.com | TESTED | 28 rows — clicks avg 0.86/day, impressions avg 63/day, CTR 1.39%, avg position 19.78 | All 5 widgets seeding and displaying; both sites verified in GSC via Hostinger DNS TXT |
+| Platform logo badges | All platforms | DONE | — | Small circular badge top-right of each widget card; icon from @iconify/react; hidden in edit mode |
+| YouTube Analytics | NEXT | — | — | — |
+| Google Ads | — | — | — | — |
+| Google Business Profile | — | — | — | — |
+
 ## Phase 3.9: Full Platform Sync Implementation (77 remaining platforms)
 
 > **Context anchor for auto-compaction:** This section tracks every platform implemented in Phase 3.9.

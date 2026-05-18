@@ -2,9 +2,10 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-  ForbiddenException,
+  Logger,
 } from '@nestjs/common';
-import { UserRole, WidgetType, Prisma } from '@prisma/client';
+import { UserRole, WidgetType, IntegrationPlatform, Prisma } from '@prisma/client';
+import { PLATFORM_DEFAULT_WIDGETS } from './widget-catalog';
 import { PrismaService } from '../../database/prisma.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { MetricAggregate, MetricGranularity } from '../metrics/dto/query-metrics.dto';
@@ -20,6 +21,8 @@ const KPI_WIDGET_TYPES = new Set<WidgetType>([WidgetType.KPI]);
 
 @Injectable()
 export class DashboardsService {
+  private readonly logger = new Logger(DashboardsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly metricsService: MetricsService,
@@ -306,7 +309,8 @@ export class DashboardsService {
           );
           return { widgetId: widget.id, widgetType: widget.widgetType, data };
         }
-      } catch {
+      } catch (err) {
+        this.logger.warn(`Widget data failed [${widget.id}] ${widget.platform} ${widget.metricKeys}: ${(err as Error).message}`);
         return { widgetId: widget.id, widgetType: widget.widgetType, data: null };
       }
     };
@@ -342,6 +346,50 @@ export class DashboardsService {
         isDefault: true,
       },
     });
+  }
+
+  // ─── Auto-seed widgets on platform connect ────────────────────────────────
+  // Called by IntegrationsService when a platform is fully connected for the
+  // first time. Finds the default dashboard and bulk-inserts the platform's
+  // default widget set. Idempotent — skips if widgets for this platform
+  // already exist on the default dashboard.
+
+  async seedPlatformWidgets(
+    tenantId: string,
+    campaignId: string,
+    platform: IntegrationPlatform,
+  ): Promise<void> {
+    const specs = PLATFORM_DEFAULT_WIDGETS[platform];
+    if (!specs?.length) return; // platform not in catalog — nothing to seed
+
+    const dashboard = await this.prisma.dashboard.findFirst({
+      where: { tenantId, campaignId, isDefault: true, deletedAt: null },
+      select: { id: true },
+    });
+    if (!dashboard) return; // no default dashboard (shouldn't happen)
+
+    // Idempotency check — skip if any widget for this platform already exists
+    const existing = await this.prisma.dashboardWidget.count({
+      where: { tenantId, dashboardId: dashboard.id, platform, deletedAt: null },
+    });
+    if (existing > 0) return;
+
+    await this.prisma.dashboardWidget.createMany({
+      data: specs.map((spec) => ({
+        tenantId,
+        dashboardId: dashboard.id,
+        campaignId,
+        widgetType: spec.widgetType,
+        platform,
+        metricKeys: spec.metricKeys,
+        config: spec.config as unknown as Prisma.InputJsonValue,
+        position: spec.position as unknown as Prisma.InputJsonValue,
+      })),
+    });
+
+    this.logger.log(
+      `Seeded ${specs.length} default widgets for ${platform} on dashboard ${dashboard.id}`,
+    );
   }
 
   // ─── Private helpers ───────────────────────────────────────────────────────

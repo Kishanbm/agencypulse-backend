@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { MetricRowInput } from '../../metrics/dto/query-metrics.dto';
 import { fetchWithRetry } from '../../../common/http/fetch-with-retry';
-import { safeInt, safeFloat, safeStr } from '../../../common/utils/safe-parse';
+import { safeInt } from '../../../common/utils/safe-parse';
 
 /**
  * Twilio API service — call tracking metrics.
@@ -46,6 +46,14 @@ export class TwilioApiService {
     if (!accountSid || accountSid === 'default') {
       throw new BadRequestException('Twilio requires an Account SID. Reconnect and supply your Twilio Account SID.');
     }
+
+    // externalAccountId may be stored as JSON {"accessId":"AC..."} by the connect flow
+    let resolvedSid = accountSid;
+    try {
+      const parsed = JSON.parse(accountSid) as { accessId?: string };
+      if (parsed.accessId) resolvedSid = parsed.accessId;
+    } catch { /* not JSON — use as-is */ }
+    accountSid = resolvedSid;
 
     const params = new URLSearchParams({
       'StartTime>': `${dateRange.from}T00:00:00Z`,

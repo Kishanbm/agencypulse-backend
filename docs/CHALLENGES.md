@@ -49,6 +49,51 @@ This prevents repeating the same mistakes.
 
 ---
 
+## CHALLENGE-020: GSC CTR stored as 0–1 decimal, displayed as fraction instead of percent
+**Date**: 2026-05-15
+**Challenge**: GSC Clicks widget showed 25, Impressions showed 1.9K, but CTR showed values like 0.0139 instead of 1.39%.
+**Root Cause**: The Google Search Console API returns `ctr` as a 0–1 decimal (0.0139 = 1.39%). The sync processor stored the raw value without converting. The `formatValue('ctr', value)` formatter treated it as a whole-number percent (so 0.0139 displayed as 0.01%).
+**Resolution**: In `integration-sync.processor.ts` `syncGsc`: multiply CTR by 100 at storage time — `value: String(row.ctr * 100)`. Now 0.0139 is stored as 1.39 and displays correctly as 1.39%.
+**Lesson**: Always check platform API docs for ratio field encoding. GSC CTR is 0–1; store as whole-number percent at write time so the formatter treats it consistently with other ratio metrics.
+
+---
+
+## CHALLENGE-021: GSC site picker modal not shown after OAuth callback
+**Date**: 2026-05-15
+**Challenge**: After completing Google OAuth for GSC, the user was redirected back to the integrations page with `?connected=google-search-console` but no property selection modal appeared. The connection was saved without a site URL (`externalAccountId` empty), so syncs silently skipped.
+**Root Cause**: The `useEffect` in `IntegrationsPage.tsx` that handles `?connected=...` callbacks only handled `?connected=ga4`. GSC wasn't in the switch.
+**Resolution**: Added `else if (connected.toLowerCase() === 'google-search-console') { setGscSitePicker(true); }` to the useEffect. Built full `GscSitePickerModal` component matching the GA4 property picker pattern — fetches `GET /integrations/google-search-console/sites`, saves via `POST /integrations/google-search-console/select-site`.
+**Lesson**: Every two-step OAuth platform (OAuth → property selection) needs its own `?connected=` branch in the integrations page useEffect. Add it when building the platform's OAuth flow, not after testing.
+
+---
+
+## CHALLENGE-022: GSC selectSite bypassed auto-seed and sync dispatch
+**Date**: 2026-05-15
+**Challenge**: After selecting a GSC site, no widgets appeared on the dashboard and no sync job ran.
+**Root Cause**: `GscOAuthService.selectSite` called `integrationsService.storeTokens` directly to save the `externalAccountId`. This bypassed the auto-seed + sync dispatch logic in `IntegrationsService.upsert`, which triggers when `externalAccountId` is set for the first time. GA4 avoids this because its property selection goes through the generic `PUT /integrations` endpoint.
+**Resolution**: Added `triggerPostConnection(tenantId, campaignId, platform)` method to `IntegrationsService` — seeds widgets + dispatches immediate sync job. Called from `selectSite` with `await`. Any future two-step OAuth platform (LinkedIn, Amazon Ads, etc.) should also call `triggerPostConnection` after saving the external account ID.
+**Lesson**: Two-step OAuth platforms that save `externalAccountId` outside of `upsertConnection` must explicitly call `triggerPostConnection`. Document this pattern so it's not missed for future platforms.
+
+---
+
+## CHALLENGE-023: Widget seeding race condition — dashboard loaded before widgets were in DB
+**Date**: 2026-05-15
+**Challenge**: After GSC was connected and the site was selected, the dashboard was navigated to immediately and showed no GSC widgets — even though the widgets were being seeded.
+**Root Cause**: `seedPlatformWidgets` was called as fire-and-forget (`.catch()`) inside both `triggerPostConnection` and `upsert`. The HTTP response (201) returned before `seedPlatformWidgets` finished writing rows to `dashboard_widgets`. The frontend navigated to the dashboard and fetched widgets before they existed.
+**Resolution**: Changed `seedPlatformWidgets` from fire-and-forget to `await` in both call sites. Now the HTTP response isn't sent until seeding completes — widgets are guaranteed in DB when the frontend loads.
+**Lesson**: `seedPlatformWidgets` is a fast DB insert (< 50ms). Awaiting it blocks the HTTP response by a tiny amount but eliminates the race condition. Don't fire-and-forget operations that the frontend depends on immediately after the response.
+
+---
+
+## CHALLENGE-024: CTR widget silently showing "No data" with no error trace
+**Date**: 2026-05-15
+**Challenge**: The CTR KPI widget showed "No data for selected range" while Clicks, Impressions, and Avg Position all showed data. No error in the browser console. No error in backend logs.
+**Root Cause**: `MetricsService.assertAggregateAllowed` threw `BadRequestException` when `aggregation=avg` was requested for `metricKey='ctr'` (CTR was in a `DERIVED_METRIC_KEYS` block-list intended for a "Phase 5 KPI engine" that was never built). The `dashboards.service.ts` widget data loop caught the exception silently with a bare `catch {}` and returned `data: null`, which the frontend renders as "No data".
+**Resolution**: Removed the `DERIVED_METRIC_KEYS` restriction from `metrics.service.ts` — averaging daily stored CTR values is standard analytics practice (Google Analytics does the same). Changed the bare `catch {}` in `dashboards.service.ts` to `catch (err)` with a `this.logger.warn(...)` call so future errors are visible.
+**Lesson**: Never use bare `catch {}` in a widget data loop — at minimum log the error. Silent failures make debugging extremely hard. Also: don't build guards for future engines that don't exist yet.
+
+---
+
 ## CHALLENGE-006: Two-role DB pattern — all auth ops blocked by RLS
 **Date**: 2026-04-17
 **Challenge**: After creating `agencypulse_app` role (non-owner, subject to RLS) and pointing DATABASE_URL at it, all auth operations failed. Register: blocked. Login: "Agency not found." JWT validation: "User not found or inactive."

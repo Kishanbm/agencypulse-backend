@@ -1,7 +1,6 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { MetricRowInput } from '../../metrics/dto/query-metrics.dto';
 import { fetchWithRetry } from '../../../common/http/fetch-with-retry';
-import { safeInt, safeFloat, safeStr } from '../../../common/utils/safe-parse';
 
 /**
  * Google PageSpeed Insights API service — Core Web Vitals and Lighthouse scores.
@@ -42,6 +41,12 @@ export class GooglePagespeedApiService {
         'Google PageSpeed requires a target URL. Reconnect and supply the URL to audit.',
       );
     }
+
+    // externalAccountId may be stored as JSON {"apiUrl":"..."} by the connect flow
+    try {
+      const parsed = JSON.parse(targetUrl) as { apiUrl?: string };
+      if (parsed.apiUrl) targetUrl = parsed.apiUrl;
+    } catch { /* not JSON — use as-is */ }
 
     const rows: MetricRowInput[] = [];
     const recordedAt = dateRange.to;
